@@ -1,6 +1,0 @@
-com/yuga/spring_rds/SpringRdsApplication.class
-com/yuga/spring_rds/model/User.class
-com/yuga/spring_rds/service/UserService.class
-com/yuga/spring_rds/controller/UserController.class
-com/yuga/spring_rds/model/User$UserBuilder.class
-com/yuga/spring_rds/repository/UserRepository.class
