@@ -1,10 +1,11 @@
 package com.yuga.spring_rds.repository;
 
 import com.yuga.spring_rds.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+  Optional<User> findByUsername(String username);
 
-  User findByName(String name);
+  Optional<User> findByEmail(String email);
 }
