@@ -30,7 +30,7 @@ public class UserService {
     if (userOpt.isPresent()) {
       User user = userOpt.get();
       if (PasswordUtil.matches(password, user.getPassword())) {
-        return ResponseEntity.ok().body(JwtUtil.generateToken(user.getUsername()));
+        return ResponseEntity.ok().body(JwtUtil.generateToken(user.getId()));
       }
     }
     return ResponseEntity.status(403).body("User does not exist!");

@@ -1,7 +1,6 @@
-package com.yuga.spring_rds.model;
+package com.yuga.spring_rds.dto;
 
-import jakarta.persistence.Embeddable;
-import java.io.Serializable;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,8 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Embeddable
-public class ContactId implements Serializable {
-  private Long userId;
+public class ContactDTO {
   private String phoneNumber;
+  private String name;
 }

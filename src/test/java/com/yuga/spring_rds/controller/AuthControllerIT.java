@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.SpringRdsApplication;
 import com.yuga.spring_rds.model.User;
 import com.yuga.spring_rds.repository.UserRepository;
+import com.yuga.spring_rds.util.TestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +42,7 @@ class AuthControllerIT {
   @Test
   @Order(1)
   void testRegisterUser() throws Exception {
-    User user = new User();
-    user.setUsername("testUser");
-    user.setEmail("testUser@example.com");
-    user.setPassword("password123");
+    User user = TestUtil.getUser();
 
     userRepository
         .findByUsernameOrEmail(user.getUsername(), user.getEmail())
@@ -58,17 +56,13 @@ class AuthControllerIT {
                 .content(objectMapper.writeValueAsString(user)))
         .andExpect(status().isOk());
 
-    assertThat(userRepository.findByUsernameOrEmail("testUser", "testUser@example.com"))
-        .isPresent();
+    assertThat(userRepository.findByUsernameOrEmail(TestUtil.USERNAME, null)).isPresent();
   }
 
   @Test
   @Order(2)
   void testLoginUser() throws Exception {
-    User user = new User();
-    user.setUsername("testUser");
-    user.setEmail("testUser@example.com");
-    user.setPassword("password123");
+    User user = TestUtil.getUser();
 
     log.info("🔑 Testing login with username: {}", user.getUsername());
 
@@ -77,8 +71,8 @@ class AuthControllerIT {
             .perform(
                 post("/api/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .queryParam("id", user.getUsername())
-                    .queryParam("password", user.getPassword()))
+                    .queryParam("id", TestUtil.USERNAME)
+                    .queryParam("password", TestUtil.PASSWORD))
             .andDo(result1 -> log.info("Result: {}", result1.getResponse().getContentAsString()))
             .andExpect(status().isOk())
             .andReturn();
