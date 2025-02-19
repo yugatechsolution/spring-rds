@@ -1,5 +1,6 @@
 package com.yuga.spring_rds.service;
 
+import com.yuga.spring_rds.dto.UserDTO;
 import com.yuga.spring_rds.model.User;
 import com.yuga.spring_rds.repository.UserRepository;
 import com.yuga.spring_rds.util.JwtUtil;
@@ -14,23 +15,35 @@ public class UserService {
 
   @Autowired private UserRepository userRepository;
 
-  public ResponseEntity<String> registerUser(User user) {
+  public ResponseEntity<?> registerUser(User user) {
     if (userRepository.findByUsernameOrEmail(user.getUsername(), user.getEmail()).isPresent()) {
       return ResponseEntity.badRequest().body("User already registered");
     }
     String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
     user.setPassword(hashedPassword);
     userRepository.save(user);
-    return ResponseEntity.ok().body("User registered successfully!");
+    return ResponseEntity.ok()
+        .body(
+            UserDTO.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .token(JwtUtil.generateToken(user.getId()))
+                .build());
   }
 
-  public ResponseEntity<String> authenticateUser(String identifier, String password) {
+  public ResponseEntity<?> authenticateUser(String identifier, String password) {
     Optional<User> userOpt = userRepository.findByUsernameOrEmail(identifier, identifier);
 
     if (userOpt.isPresent()) {
       User user = userOpt.get();
       if (PasswordUtil.matches(password, user.getPassword())) {
-        return ResponseEntity.ok().body(JwtUtil.generateToken(user.getId()));
+        return ResponseEntity.ok()
+            .body(
+                UserDTO.builder()
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .token(JwtUtil.generateToken(user.getId()))
+                    .build());
       }
     }
     return ResponseEntity.status(403).body("User does not exist!");
