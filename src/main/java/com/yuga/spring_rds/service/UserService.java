@@ -2,10 +2,11 @@ package com.yuga.spring_rds.service;
 
 import com.yuga.spring_rds.model.User;
 import com.yuga.spring_rds.repository.UserRepository;
+import com.yuga.spring_rds.util.JwtUtil;
 import com.yuga.spring_rds.util.PasswordUtil;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,28 +14,25 @@ public class UserService {
 
   @Autowired private UserRepository userRepository;
 
-  // ✅ Register User
-  public String registerUser(User user) {
-    if (userRepository.findByUsername(user.getUsername()).isPresent()
-        || userRepository.findByEmail(user.getEmail()).isPresent()) {
-      return "Username or Email already in use";
+  public ResponseEntity<String> registerUser(User user) {
+    if (userRepository.findByUsernameOrEmail(user.getUsername(), user.getEmail()).isPresent()) {
+      return ResponseEntity.badRequest().body("User already registered");
     }
-
-    user.setPassword(PasswordUtil.hashPassword(user.getPassword()));
+    String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+    user.setPassword(hashedPassword);
     userRepository.save(user);
-    return "User registered successfully!";
+    return ResponseEntity.ok().body("User registered successfully!");
   }
 
-  // ✅ Login with either username OR email
-  public boolean loginUser(String identifier, String password) {
-    Optional<User> userOptional =
-        userRepository.findByUsername(identifier).or(() -> userRepository.findByEmail(identifier));
+  public ResponseEntity<String> authenticateUser(String identifier, String password) {
+    Optional<User> userOpt = userRepository.findByUsernameOrEmail(identifier, identifier);
 
-    if (userOptional.isPresent()) {
-      User user = userOptional.get();
-      String hashedPassword = PasswordUtil.hashPassword(password);
-      return hashedPassword.equals(user.getPassword());
+    if (userOpt.isPresent()) {
+      User user = userOpt.get();
+      if (PasswordUtil.matches(password, user.getPassword())) {
+        return ResponseEntity.ok().body(JwtUtil.generateToken(user.getUsername()));
+      }
     }
-    return false;
+    return ResponseEntity.status(403).body("User does not exist!");
   }
 }

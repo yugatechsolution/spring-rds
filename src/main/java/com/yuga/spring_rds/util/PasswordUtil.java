@@ -1,22 +1,29 @@
 package com.yuga.spring_rds.util;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class PasswordUtil {
+  private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-  // ✅ Hashes a plain-text password using SHA-256
-  public static String hashPassword(String password) {
-    try {
-      MessageDigest md = MessageDigest.getInstance("SHA-256");
-      byte[] hashedBytes = md.digest(password.getBytes());
-      StringBuilder sb = new StringBuilder();
-      for (byte b : hashedBytes) {
-        sb.append(String.format("%02x", b));
-      }
-      return sb.toString();
-    } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException("Error hashing password", e);
-    }
+  /**
+   * Hash a password using BCrypt.
+   *
+   * @param rawPassword The plain text password
+   * @return The hashed password
+   */
+  public static String hashPassword(String rawPassword) {
+    return passwordEncoder.encode(rawPassword);
+  }
+
+  /**
+   * Check if a raw password matches a hashed password.
+   *
+   * @param rawPassword The plain text password
+   * @param hashedPassword The stored hashed password
+   * @return true if passwords match, false otherwise
+   */
+  public static boolean matches(String rawPassword, String hashedPassword) {
+    return passwordEncoder.matches(rawPassword, hashedPassword);
   }
 }

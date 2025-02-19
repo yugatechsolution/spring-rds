@@ -1,6 +1,5 @@
 package com.yuga.spring_rds.model;
 
-import com.yuga.spring_rds.util.PasswordUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,9 +23,4 @@ public class User {
 
   @Column(nullable = false, length = 64)
   private String password;
-
-  // ✅ Hash password before storing
-  public void setPassword(String plainPassword) {
-    this.password = PasswordUtil.hashPassword(plainPassword);
-  }
 }

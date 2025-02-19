@@ -4,3 +4,11 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(64) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS contacts (
+    user_id BIGINT NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    name VARCHAR(255),
+    PRIMARY KEY (user_id, phone_number),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
