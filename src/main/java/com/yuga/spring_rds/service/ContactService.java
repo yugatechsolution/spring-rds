@@ -102,7 +102,7 @@ public class ContactService {
           errors.add("Invalid phone number format in row: " + record);
           continue;
         }
-        validContacts.add(new ContactDTO(name, phoneNumber));
+        validContacts.add(ContactDTO.builder().name(name).phoneNumber(phoneNumber).build());
       }
       List<Contact> savedContacts = bulkAddContacts(user, validContacts);
       return Map.of("savedContacts", savedContacts, "errors", errors);
