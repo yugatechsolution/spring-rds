@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -36,21 +37,30 @@ public class ContactService {
     return contactRepository.saveAll(contacts);
   }
 
-  public List<Contact> getContactsByUserId(Long userId) {
-    return contactRepository.findByIdUserId(userId);
+  public List<ContactDTO> getContactsByUserId(Long userId) {
+    return contactRepository.findByIdUserId(userId).stream()
+        .map(
+            contact ->
+                ContactDTO.builder()
+                    .name(contact.getName())
+                    .phoneNumber(contact.getId().getPhoneNumber())
+                    .build())
+        .collect(Collectors.toList());
   }
 
-  public Contact addContact(User user, ContactDTO contactDTO) {
-    return contactRepository.save(
-        Contact.builder()
-            .id(
-                ContactId.builder()
-                    .phoneNumber(contactDTO.getPhoneNumber())
-                    .userId(user.getId())
-                    .build())
-            .name(contactDTO.getName())
-            .user(user)
-            .build());
+  public ContactDTO addContact(User user, ContactDTO contactDTO) {
+    Contact contact =
+        contactRepository.save(
+            Contact.builder()
+                .id(
+                    ContactId.builder()
+                        .phoneNumber(contactDTO.getPhoneNumber())
+                        .userId(user.getId())
+                        .build())
+                .name(contactDTO.getName())
+                .user(user)
+                .build());
+    return contactDTO;
   }
 
   public void deleteContact(Long userId, String phoneNumber) {

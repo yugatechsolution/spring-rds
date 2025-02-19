@@ -2,7 +2,6 @@ package com.yuga.spring_rds.controller;
 
 import com.yuga.spring_rds.advice.RequestContext;
 import com.yuga.spring_rds.dto.ContactDTO;
-import com.yuga.spring_rds.model.Contact;
 import com.yuga.spring_rds.service.ContactService;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +19,8 @@ public class ContactController {
   @Autowired private ContactService contactService;
 
   @GetMapping
-  public ResponseEntity<List<Contact>> getAllContacts() {
-    List<Contact> contacts = contactService.getContactsByUserId(RequestContext.getUserId());
+  public ResponseEntity<List<ContactDTO>> getAllContacts() {
+    List<ContactDTO> contacts = contactService.getContactsByUserId(RequestContext.getUserId());
     return ResponseEntity.ok(contacts);
   }
 
@@ -33,8 +32,8 @@ public class ContactController {
   }
 
   @PostMapping
-  public ResponseEntity<Contact> addContact(@RequestBody ContactDTO contactDTO) {
-    Contact savedContact = contactService.addContact(RequestContext.getUser(), contactDTO);
+  public ResponseEntity<ContactDTO> addContact(@RequestBody ContactDTO contactDTO) {
+    ContactDTO savedContact = contactService.addContact(RequestContext.getUser(), contactDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(savedContact);
   }
 
