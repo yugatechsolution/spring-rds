@@ -19,34 +19,33 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Slf4j
 public class JwtAspect {
 
-    @Autowired
-    private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-    @Before("execution(* com.yuga.spring_rds.controller.ContactController.*(..))")
-    public void beforeMethodExecution(JoinPoint joinPoint) {
-        ServletRequestAttributes attributes =
-                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes == null) {
-            throw new IllegalStateException("No request attributes found");
-        }
-
-        HttpServletRequest request = attributes.getRequest();
-        log.info("🚀 Incoming request: {} {}", request.getMethod(), request.getRequestURI());
-
-        String userId =
-                JwtUtil.validateTokenAndRetrieveUserId(request.getHeader(Constants.AUTHORIZATION_HEADER));
-
-        userRepository
-                .findById(Long.valueOf(userId))
-                .ifPresentOrElse(
-                        RequestContext::setUser,
-                        () -> {
-                            throw new RuntimeException("No user found with user id in JWT");
-                        });
+  @Before("execution(* com.yuga.spring_rds.controller.ContactController.*(..))")
+  public void beforeMethodExecution(JoinPoint joinPoint) {
+    ServletRequestAttributes attributes =
+        (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+    if (attributes == null) {
+      throw new IllegalStateException("No request attributes found");
     }
 
-    @After("execution(* com.yuga.spring_rds.controller.ContactController.*(..))")
-    public void afterMethodExecution() {
-        RequestContext.clear();
-    }
+    HttpServletRequest request = attributes.getRequest();
+    log.info("🚀 Incoming request: {} {}", request.getMethod(), request.getRequestURI());
+
+    String userId =
+        JwtUtil.validateTokenAndRetrieveUserId(request.getHeader(Constants.AUTHORIZATION_HEADER));
+
+    userRepository
+        .findById(Long.valueOf(userId))
+        .ifPresentOrElse(
+            RequestContext::setUser,
+            () -> {
+              throw new RuntimeException("No user found with user id in JWT");
+            });
+  }
+
+  @After("execution(* com.yuga.spring_rds.controller.ContactController.*(..))")
+  public void afterMethodExecution() {
+    RequestContext.clear();
+  }
 }

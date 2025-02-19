@@ -2,8 +2,7 @@ package com.yuga.spring_rds.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.SpringRdsApplication;
@@ -15,6 +14,7 @@ import com.yuga.spring_rds.repository.UserRepository;
 import com.yuga.spring_rds.util.JwtUtil;
 import com.yuga.spring_rds.util.PasswordUtil;
 import com.yuga.spring_rds.util.TestUtil;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -54,6 +55,31 @@ class ContactControllerIT {
             .orElseGet(() -> userRepository.saveAndFlush(testUser));
     contactRepository.findByIdUserId(testUser.getId()).forEach(contactRepository::delete);
     jwtToken = "Bearer " + JwtUtil.generateToken(testUser.getId());
+  }
+
+  @Test
+  void testBulkUploadContacts_Success() throws Exception {
+    // Sample CSV data
+    String csvData =
+        "name,phoneNumber\n"
+            + "John Doe,9876543210\n"
+            + "Jane Smith,1234567890\n"
+            + "Invalid User,12345\n";
+
+    MockMultipartFile file =
+        new MockMultipartFile(
+            "file", "contacts.csv", "text/csv", csvData.getBytes(StandardCharsets.UTF_8));
+
+    mockMvc
+        .perform(
+            multipart("/api/contacts/bulk-upload")
+                .file(file)
+                .header("Authorization", jwtToken)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.savedContacts").isArray())
+        .andExpect(jsonPath("$.savedContacts.length()").value(2)) // Only valid ones should be saved
+        .andExpect(jsonPath("$.errors.length()").value(1)); // One invalid row
   }
 
   @Test

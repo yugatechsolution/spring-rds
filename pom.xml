@@ -49,6 +49,13 @@
 			<version>4.0.1</version>
 		</dependency>
 
+		<!-- CSV Parsing -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.10.0</version>
+		</dependency>
+
 		<!-- Security -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

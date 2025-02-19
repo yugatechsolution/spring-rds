@@ -5,10 +5,13 @@ import com.yuga.spring_rds.dto.ContactDTO;
 import com.yuga.spring_rds.model.Contact;
 import com.yuga.spring_rds.service.ContactService;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/contacts")
@@ -20,6 +23,13 @@ public class ContactController {
   public ResponseEntity<List<Contact>> getAllContacts() {
     List<Contact> contacts = contactService.getContactsByUserId(RequestContext.getUserId());
     return ResponseEntity.ok(contacts);
+  }
+
+  /** Bulk upload contacts from CSV file */
+  @PostMapping(value = "/bulk-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<Map<String, Object>> bulkUploadContacts(
+      @RequestParam("file") MultipartFile file) {
+    return ResponseEntity.ok(contactService.processBulkUpload(file, RequestContext.getUser()));
   }
 
   @PostMapping
