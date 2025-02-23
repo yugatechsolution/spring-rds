@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.SpringRdsApplication;
-import com.yuga.spring_rds.model.User;
+import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.repository.UserRepository;
 import com.yuga.spring_rds.util.TestUtil;
 import lombok.extern.slf4j.Slf4j;

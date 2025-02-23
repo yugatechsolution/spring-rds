@@ -1,7 +1,7 @@
 package com.yuga.spring_rds.repository;
 
-import com.yuga.spring_rds.model.Contact;
-import com.yuga.spring_rds.model.ContactId;
+import com.yuga.spring_rds.domain.Contact;
+import com.yuga.spring_rds.domain.ContactId;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,4 +1,4 @@
-package com.yuga.spring_rds.model;
+package com.yuga.spring_rds.domain;
 
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;

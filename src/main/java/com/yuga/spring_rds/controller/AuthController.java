@@ -1,6 +1,6 @@
 package com.yuga.spring_rds.controller;
 
-import com.yuga.spring_rds.model.User;
+import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

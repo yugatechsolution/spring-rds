@@ -1,6 +1,6 @@
 package com.yuga.spring_rds.advice;
 
-import com.yuga.spring_rds.model.User;
+import com.yuga.spring_rds.domain.User;
 import org.springframework.stereotype.Component;
 
 @Component

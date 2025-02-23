@@ -1,6 +1,6 @@
 package com.yuga.spring_rds.repository;
 
-import com.yuga.spring_rds.model.User;
+import com.yuga.spring_rds.domain.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

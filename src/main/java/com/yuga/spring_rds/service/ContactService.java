@@ -1,9 +1,9 @@
 package com.yuga.spring_rds.service;
 
+import com.yuga.spring_rds.domain.Contact;
+import com.yuga.spring_rds.domain.ContactId;
+import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.dto.ContactDTO;
-import com.yuga.spring_rds.model.Contact;
-import com.yuga.spring_rds.model.ContactId;
-import com.yuga.spring_rds.model.User;
 import com.yuga.spring_rds.repository.ContactRepository;
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -6,9 +6,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.SpringRdsApplication;
+import com.yuga.spring_rds.domain.Contact;
+import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.dto.ContactDTO;
-import com.yuga.spring_rds.model.Contact;
-import com.yuga.spring_rds.model.User;
 import com.yuga.spring_rds.repository.ContactRepository;
 import com.yuga.spring_rds.repository.UserRepository;
 import com.yuga.spring_rds.util.JwtUtil;

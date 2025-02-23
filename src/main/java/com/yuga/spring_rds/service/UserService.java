@@ -1,7 +1,7 @@
 package com.yuga.spring_rds.service;
 
+import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.dto.UserDTO;
-import com.yuga.spring_rds.model.User;
 import com.yuga.spring_rds.repository.UserRepository;
 import com.yuga.spring_rds.util.JwtUtil;
 import com.yuga.spring_rds.util.PasswordUtil;

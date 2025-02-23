@@ -1,9 +1,9 @@
 package com.yuga.spring_rds.util;
 
+import com.yuga.spring_rds.domain.Contact;
+import com.yuga.spring_rds.domain.ContactId;
+import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.dto.ContactDTO;
-import com.yuga.spring_rds.model.Contact;
-import com.yuga.spring_rds.model.ContactId;
-import com.yuga.spring_rds.model.User;
 
 public class TestUtil {
 
@@ -26,7 +26,6 @@ public class TestUtil {
   }
 
   public static ContactDTO getContactDTO() {
-    User testUser = getUser();
     return ContactDTO.builder().phoneNumber(PHONE_NUMBER).name("John Doe").build();
   }
 }
