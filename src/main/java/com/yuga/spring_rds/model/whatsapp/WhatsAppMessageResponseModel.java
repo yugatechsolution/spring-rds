@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WhatsAppResponseModel {
+public class WhatsAppMessageResponseModel {
   private String messagingProduct;
   private List<Message> messages;
   private String contacts;

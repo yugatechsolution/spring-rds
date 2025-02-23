@@ -1,7 +1,7 @@
 package com.yuga.spring_rds.controller;
 
 import com.yuga.spring_rds.model.request.BroadcastMessageRequest;
-import com.yuga.spring_rds.model.whatsapp.WhatsAppResponseModel;
+import com.yuga.spring_rds.model.whatsapp.WhatsAppMessageResponseModel;
 import com.yuga.spring_rds.service.WhatsAppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +17,9 @@ public class WhatsAppController {
   @Autowired private WhatsAppService whatsappService;
 
   @PostMapping("/broadcast")
-  public ResponseEntity<WhatsAppResponseModel> broadcastMessage(
+  public ResponseEntity<WhatsAppMessageResponseModel> broadcastMessage(
       @RequestBody BroadcastMessageRequest request) {
-    WhatsAppResponseModel response = whatsappService.sendWhatsAppMessage(request);
+    WhatsAppMessageResponseModel response = whatsappService.sendWhatsAppMessage(request);
     return ResponseEntity.ok(response);
   }
 }

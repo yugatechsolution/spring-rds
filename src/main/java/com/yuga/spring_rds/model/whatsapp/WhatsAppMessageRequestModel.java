@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WhatsAppRequestModel {
+public class WhatsAppMessageRequestModel {
   private String messagingProduct = "whatsapp";
   private String recipientType = "individual";
   private String to;
