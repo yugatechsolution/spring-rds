@@ -1,20 +1,19 @@
 package com.yuga.spring_rds.util;
 
-import com.yuga.spring_rds.model.whatsapp.WhatsAppMessageRequestModel;
-import com.yuga.spring_rds.model.whatsapp.WhatsAppTemplateRequestModel;
+import com.yuga.spring_rds.model.whatsapp.request.WhatsAppTemplateRequestModel;
+import com.yuga.spring_rds.model.whatsapp.request.WhatsAppTextMessageRequestModel;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class WhatsAppUtil {
 
-  public static WhatsAppMessageRequestModel buildWhatsAppMessageRequestModel(
-      String phoneNumber, String message) {
-    return WhatsAppMessageRequestModel.builder()
+  public static WhatsAppTextMessageRequestModel buildWhatsAppTextMessageRequestModel(
+      String phoneNumber, String body) {
+    return WhatsAppTextMessageRequestModel.builder()
         .messagingProduct("whatsapp")
         .to(phoneNumber)
         .type("text")
-        .recipientType("individual")
-        .text(WhatsAppMessageRequestModel.MessageText.builder().body(message).build())
+        .text(WhatsAppTextMessageRequestModel.Text.builder().body(body).build())
         .build();
   }
 

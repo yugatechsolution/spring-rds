@@ -1,4 +1,4 @@
-package com.yuga.spring_rds.model.whatsapp;
+package com.yuga.spring_rds.model.whatsapp.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfiguration {
 
-  @Value("${whatsapp.api.url:https://graph.facebook.com/v18.0/}")
+  @Value("${whatsapp.api.url:https://graph.facebook.com/v21.0/}")
   private String whatsAppApiUrl;
 
   @Value("${whatsapp.api.token}")

@@ -1,4 +1,4 @@
-package com.yuga.spring_rds.model.whatsapp;
+package com.yuga.spring_rds.model.whatsapp.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
