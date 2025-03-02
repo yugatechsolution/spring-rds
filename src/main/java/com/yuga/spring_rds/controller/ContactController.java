@@ -37,6 +37,19 @@ public class ContactController {
     return ResponseEntity.status(HttpStatus.CREATED).body(savedContact);
   }
 
+  /** Update contact */
+  @PutMapping
+  public ResponseEntity<?> updateContact(
+      @RequestParam String phoneNumber, @RequestParam String name) {
+    try {
+      ContactDTO updatedContact =
+          contactService.updateContact(RequestContext.getUserId(), phoneNumber, name);
+      return ResponseEntity.ok(updatedContact);
+    } catch (RuntimeException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+  }
+
   @DeleteMapping
   public ResponseEntity<String> deleteContact(@RequestParam String phoneNumber) {
     try {

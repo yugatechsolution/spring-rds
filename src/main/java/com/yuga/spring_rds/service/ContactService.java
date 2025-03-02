@@ -111,4 +111,22 @@ public class ContactService {
       return Map.of("message", "Error processing CSV file");
     }
   }
+
+  public ContactDTO updateContact(Long userId, String phoneNumber, String name) {
+    ContactId contactId = new ContactId(userId, phoneNumber);
+
+    return contactRepository
+        .findById(contactId)
+        .map(
+            existingContact -> {
+              existingContact.setName(name); // Update name
+              contactRepository.save(existingContact);
+              return ContactDTO.builder()
+                  .name(existingContact.getName())
+                  .phoneNumber(existingContact.getId().getPhoneNumber())
+                  .build();
+            })
+        .orElseThrow(
+            () -> new RuntimeException("Contact not found with phoneNumber: " + phoneNumber));
+  }
 }
