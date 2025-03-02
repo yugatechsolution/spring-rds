@@ -92,8 +92,8 @@ public class ContactService {
                 .build()
                 .parse(reader)) {
       for (CSVRecord record : csvParser) {
-        String name = record.get("name");
-        String phoneNumber = record.get("phoneNumber");
+        String name = record.get("Name");
+        String phoneNumber = record.get("Phone Number");
         if (name == null || name.isEmpty() || phoneNumber == null || phoneNumber.isEmpty()) {
           errors.add("Missing name or phone number in row: " + record);
           continue;
