@@ -1,9 +1,7 @@
 package com.yuga.spring_rds.connector;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
-import com.yuga.spring_rds.model.whatsapp.response.WhatsAppMessageResponseModel;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppTemplateResponseModel;
 import com.yuga.spring_rds.util.WhatsAppUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +16,7 @@ public class WhatsAppConnector {
 
   @Autowired private WebClient webClient;
 
-  public WhatsAppMessageResponseModel sendWhatsAppMessage(String phoneNumber, String templateName) {
+  public JsonNode sendWhatsAppMessage(String phoneNumber, String templateName) {
     WhatsAppMessageRequestModel whatsAppMessageRequestModel =
         WhatsAppUtil.buildWhatsAppTemplateMessageRequestModel(phoneNumber, templateName);
     log.info("Calling WhatsApp message API to send message to phoneNumber={}", phoneNumber);
@@ -41,7 +39,6 @@ public class WhatsAppConnector {
                     .map(body -> new RuntimeException("Server Error: " + body.toString())))
         .bodyToMono(JsonNode.class)
         .doOnNext(res -> log.info("Success response from WhatsApp API: {}", res))
-        .map(node -> new ObjectMapper().convertValue(node, WhatsAppMessageResponseModel.class))
         .block();
   }
 
