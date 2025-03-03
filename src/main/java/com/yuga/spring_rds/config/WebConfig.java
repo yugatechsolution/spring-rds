@@ -11,7 +11,9 @@ public class WebConfig implements WebMvcConfigurer {
   public void addCorsMappings(CorsRegistry registry) {
     registry
         .addMapping("/**")
-        .allowedOrigins("http://localhost:3000", "http://yugatechsolutions-bucket.s3-website-us-east-1.amazonaws.com") // React app URL
+        .allowedOrigins(
+            "http://localhost:3000",
+            "http://yugatechsolutions-bucket.s3-website-us-east-1.amazonaws.com") // React app URL
         .allowedMethods("GET", "POST", "PUT", "DELETE")
         .allowedHeaders("*");
   }
