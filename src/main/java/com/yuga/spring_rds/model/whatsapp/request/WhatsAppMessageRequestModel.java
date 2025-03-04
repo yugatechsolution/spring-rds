@@ -15,9 +15,13 @@ public class WhatsAppMessageRequestModel {
   @JsonProperty("messaging_product")
   private String messagingProduct;
 
+  @JsonProperty("recipient_type")
+  private String recipientType;
+
   private String to;
   private String type;
   private Template template;
+  private Text text;
 
   @Data
   @Builder
@@ -26,6 +30,17 @@ public class WhatsAppMessageRequestModel {
   public static class Template {
     private String name;
     private Language language;
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Text {
+    private String body;
+
+    @JsonProperty("preview_url")
+    private boolean previewUrl;
   }
 
   @Data

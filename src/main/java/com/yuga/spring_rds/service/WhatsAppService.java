@@ -1,12 +1,14 @@
 package com.yuga.spring_rds.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.yuga.spring_rds.connector.WhatsAppConnector;
-import com.yuga.spring_rds.model.request.BroadcastMessageTemplateRequest;
+import com.yuga.spring_rds.model.request.BroadcastMessageRequest;
 import com.yuga.spring_rds.model.response.BroadcastMessageTemplateResponse;
 import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppTemplateResponseModel;
+import com.yuga.spring_rds.util.WhatsAppUtil;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,19 +20,19 @@ public class WhatsAppService {
   @Autowired private WhatsAppConnector whatsAppConnector;
 
   public BroadcastMessageTemplateResponse broadcastWhatsAppMessageTemplate(
-      BroadcastMessageTemplateRequest request) {
+      BroadcastMessageRequest request) {
     return BroadcastMessageTemplateResponse.builder()
         .responseDetails(
-            request.getPhoneNumbers().stream()
+            IntStream.range(0, request.getPhoneNumbers().size())
+                .mapToObj(
+                    index -> WhatsAppUtil.buildWhatsAppTemplateMessageRequestModel(request, index))
+                .filter(Objects::nonNull)
                 .collect(
                     Collectors.toMap(
-                        phoneNo -> phoneNo,
-                        phoneNo -> {
+                        WhatsAppMessageRequestModel::getTo,
+                        waReqModel -> {
                           try {
-                            JsonNode response =
-                                whatsAppConnector.sendWhatsAppMessage(
-                                    phoneNo, request.getTemplateName());
-                            return "Message is sent successfully!";
+                            return whatsAppConnector.sendWhatsAppMessage(waReqModel);
                           } catch (Exception e) {
                             return e.getMessage();
                           }

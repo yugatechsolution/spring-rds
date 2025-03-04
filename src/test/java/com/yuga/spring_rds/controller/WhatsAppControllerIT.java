@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.SpringRdsApplication;
-import com.yuga.spring_rds.model.request.BroadcastMessageTemplateRequest;
+import com.yuga.spring_rds.model.request.BroadcastMessageRequest;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppMessageResponseModel;
 import com.yuga.spring_rds.service.WhatsAppService;
 import com.yuga.spring_rds.util.JwtUtil;
@@ -48,10 +48,14 @@ class WhatsAppControllerIT {
   @Order(1)
   void testBroadcastMessage_Success() throws Exception {
     // Create a valid broadcast message request
-    BroadcastMessageTemplateRequest request =
-        BroadcastMessageTemplateRequest.builder()
+    BroadcastMessageRequest request =
+        BroadcastMessageRequest.builder()
             .phoneNumbers(List.of("+916301472014"))
-            .templateName("hello_world")
+            .requestType(BroadcastMessageRequest.RequestType.TEMPLATE)
+            .templateMessageRequest(
+                BroadcastMessageRequest.TemplateMessageRequest.builder()
+                    .templateName("hello_world")
+                    .build())
             .build();
 
     String requestJson = objectMapper.writeValueAsString(request);

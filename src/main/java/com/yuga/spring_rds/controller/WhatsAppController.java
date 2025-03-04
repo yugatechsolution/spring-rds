@@ -2,7 +2,7 @@ package com.yuga.spring_rds.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yuga.spring_rds.model.request.BroadcastMessageTemplateRequest;
+import com.yuga.spring_rds.model.request.BroadcastMessageRequest;
 import com.yuga.spring_rds.model.request.WhatsAppWebhookRequest;
 import com.yuga.spring_rds.model.response.BroadcastMessageTemplateResponse;
 import com.yuga.spring_rds.service.WhatsAppService;
@@ -64,7 +64,7 @@ public class WhatsAppController {
 
   @PostMapping("/broadcast")
   public ResponseEntity<BroadcastMessageTemplateResponse> broadcastMessage(
-      @RequestBody BroadcastMessageTemplateRequest request) {
+      @RequestBody BroadcastMessageRequest request) {
     BroadcastMessageTemplateResponse response =
         whatsappService.broadcastWhatsAppMessageTemplate(request);
     return ResponseEntity.ok(response);

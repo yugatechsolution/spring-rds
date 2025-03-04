@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  # Deploy on push to main
+      - dev
 
 jobs:
   deploy:

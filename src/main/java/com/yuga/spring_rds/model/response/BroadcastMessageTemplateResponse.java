@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BroadcastMessageTemplateResponse {
-  private Map<String, String> responseDetails;
+  private Map<String, Object> responseDetails;
 }
