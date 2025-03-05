@@ -6,11 +6,13 @@ import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppMessageResponseModel;
 import com.yuga.spring_rds.repository.ChatMessageRepository;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ChatService {
 
   @Value("${whatsapp.phone.number.id}")
@@ -29,7 +31,7 @@ public class ChatService {
             .direction(ChatMessage.Direction.INCOMING)
             .messageType(ChatMessage.MessageType.TEXT)
             .build();
-    chatMessageRepository.save(chatMessage);
+    this.saveChatMessage(chatMessage);
   }
 
   public void saveMessage(
@@ -44,10 +46,15 @@ public class ChatService {
             .direction(ChatMessage.Direction.OUTGOING)
             .messageType(ChatMessage.MessageType.TEXT)
             .build();
-    chatMessageRepository.save(chatMessage);
+    this.saveChatMessage(chatMessage);
   }
 
   public List<ChatMessage> getChatHistory(String waId) {
     return chatMessageRepository.findByWaIdOrderByTimestampAsc(waId);
+  }
+
+  private void saveChatMessage(ChatMessage chatMessage) {
+    log.info("Saving chat message: {}", chatMessage);
+    chatMessageRepository.save(chatMessage);
   }
 }
