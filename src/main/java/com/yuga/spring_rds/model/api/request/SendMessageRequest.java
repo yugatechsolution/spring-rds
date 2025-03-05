@@ -1,4 +1,4 @@
-package com.yuga.spring_rds.model.request;
+package com.yuga.spring_rds.model.api.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BroadcastMessageRequest {
+public class SendMessageRequest {
   private List<String> phoneNumbers;
   private RequestType requestType;
   private TemplateMessageRequest templateMessageRequest;

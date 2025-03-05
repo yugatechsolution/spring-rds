@@ -1,4 +1,4 @@
-package com.yuga.spring_rds.model.response;
+package com.yuga.spring_rds.model.api.response;
 
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BroadcastMessageTemplateResponse {
+public class SendMessageResponse {
   private Map<String, Object> responseDetails;
 }

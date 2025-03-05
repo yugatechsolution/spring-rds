@@ -1,8 +1,8 @@
 package com.yuga.spring_rds.service;
 
 import com.yuga.spring_rds.connector.WhatsAppConnector;
-import com.yuga.spring_rds.model.request.BroadcastMessageRequest;
-import com.yuga.spring_rds.model.response.BroadcastMessageTemplateResponse;
+import com.yuga.spring_rds.model.api.request.SendMessageRequest;
+import com.yuga.spring_rds.model.api.response.SendMessageResponse;
 import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppTemplateResponseModel;
 import com.yuga.spring_rds.util.WhatsAppUtil;
@@ -15,13 +15,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class WhatsAppService {
+public class SendMessageService {
 
   @Autowired private WhatsAppConnector whatsAppConnector;
+  @Autowired private ChatService chatService;
 
-  public BroadcastMessageTemplateResponse broadcastWhatsAppMessageTemplate(
-      BroadcastMessageRequest request) {
-    return BroadcastMessageTemplateResponse.builder()
+  public SendMessageResponse sendMessage(SendMessageRequest request) {
+    return SendMessageResponse.builder()
         .responseDetails(
             IntStream.range(0, request.getPhoneNumbers().size())
                 .mapToObj(
@@ -32,7 +32,9 @@ public class WhatsAppService {
                         WhatsAppMessageRequestModel::getTo,
                         waReqModel -> {
                           try {
-                            return whatsAppConnector.sendWhatsAppMessage(waReqModel);
+                            var response = whatsAppConnector.sendWhatsAppMessage(waReqModel);
+                            chatService.saveMessage(waReqModel, response);
+                            return response;
                           } catch (Exception e) {
                             return e.getMessage();
                           }

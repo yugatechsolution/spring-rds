@@ -6,9 +6,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.SpringRdsApplication;
-import com.yuga.spring_rds.model.request.BroadcastMessageRequest;
+import com.yuga.spring_rds.model.api.request.SendMessageRequest;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppMessageResponseModel;
-import com.yuga.spring_rds.service.WhatsAppService;
+import com.yuga.spring_rds.service.SendMessageService;
 import com.yuga.spring_rds.util.JwtUtil;
 import com.yuga.spring_rds.util.TestUtil;
 import java.util.List;
@@ -34,7 +34,7 @@ class WhatsAppControllerIT {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
-  @Autowired private WhatsAppService whatsAppService;
+  @Autowired private SendMessageService sendMessageService;
 
   private String jwtToken;
 
@@ -48,12 +48,12 @@ class WhatsAppControllerIT {
   @Order(1)
   void testBroadcastMessage_Success() throws Exception {
     // Create a valid broadcast message request
-    BroadcastMessageRequest request =
-        BroadcastMessageRequest.builder()
+    SendMessageRequest request =
+        SendMessageRequest.builder()
             .phoneNumbers(List.of("+916301472014"))
-            .requestType(BroadcastMessageRequest.RequestType.TEMPLATE)
+            .requestType(SendMessageRequest.RequestType.TEMPLATE)
             .templateMessageRequest(
-                BroadcastMessageRequest.TemplateMessageRequest.builder()
+                SendMessageRequest.TemplateMessageRequest.builder()
                     .templateName("hello_world")
                     .build())
             .build();
@@ -64,7 +64,7 @@ class WhatsAppControllerIT {
     String responseJson =
         mockMvc
             .perform(
-                post("/api/whatsapp/broadcast")
+                post("/api/whatsapp/message")
                     .header("Authorization", jwtToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestJson))

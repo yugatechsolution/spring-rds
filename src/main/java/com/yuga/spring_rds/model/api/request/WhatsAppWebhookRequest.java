@@ -1,4 +1,4 @@
-package com.yuga.spring_rds.model.request;
+package com.yuga.spring_rds.model.api.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
@@ -39,7 +39,7 @@ public class WhatsAppWebhookRequest {
   @AllArgsConstructor
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Value {
-    private String messaging_product;
+    private String messagingProduct;
     private Metadata metadata;
     private List<Contact> contacts;
     private List<Message> messages;
@@ -51,8 +51,8 @@ public class WhatsAppWebhookRequest {
   @AllArgsConstructor
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Metadata {
-    private String display_phone_number;
-    private String phone_number_id;
+    private String displayPhoneNumber;
+    private String phoneNumberId;
   }
 
   @Data
@@ -62,7 +62,7 @@ public class WhatsAppWebhookRequest {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Contact {
     private Profile profile;
-    private String wa_id;
+    private String waId;
   }
 
   @Data
@@ -83,6 +83,8 @@ public class WhatsAppWebhookRequest {
     private String from;
     private String id;
     private Text text;
+    private String timestamp;
+    private String type;
   }
 
   @Data

@@ -1,6 +1,6 @@
 package com.yuga.spring_rds.util;
 
-import com.yuga.spring_rds.model.request.BroadcastMessageRequest;
+import com.yuga.spring_rds.model.api.request.SendMessageRequest;
 import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
 import lombok.experimental.UtilityClass;
 
@@ -8,9 +8,9 @@ import lombok.experimental.UtilityClass;
 public class WhatsAppUtil {
 
   public static WhatsAppMessageRequestModel buildWhatsAppTemplateMessageRequestModel(
-      BroadcastMessageRequest broadcastMessageRequest, int index) {
-    String phoneNumber = broadcastMessageRequest.getPhoneNumbers().get(index);
-    switch (broadcastMessageRequest.getRequestType()) {
+      SendMessageRequest sendMessageRequest, int index) {
+    String phoneNumber = sendMessageRequest.getPhoneNumbers().get(index);
+    switch (sendMessageRequest.getRequestType()) {
       case TEMPLATE ->
           WhatsAppMessageRequestModel.builder()
               .messagingProduct("whatsapp")
@@ -18,7 +18,7 @@ public class WhatsAppUtil {
               .type("template")
               .template(
                   WhatsAppMessageRequestModel.Template.builder()
-                      .name(broadcastMessageRequest.getTemplateMessageRequest().getTemplateName())
+                      .name(sendMessageRequest.getTemplateMessageRequest().getTemplateName())
                       .language(new WhatsAppMessageRequestModel.Language("en_US"))
                       .build())
               .build();
@@ -30,7 +30,7 @@ public class WhatsAppUtil {
               .type("text")
               .text(
                   WhatsAppMessageRequestModel.Text.builder()
-                      .body(broadcastMessageRequest.getTextMessageRequest().getTextBody())
+                      .body(sendMessageRequest.getTextMessageRequest().getTextBody())
                       .previewUrl(false)
                       .build())
               .build();
