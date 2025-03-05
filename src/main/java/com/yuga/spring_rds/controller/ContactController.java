@@ -3,6 +3,7 @@ package com.yuga.spring_rds.controller;
 import com.yuga.spring_rds.advice.RequestContext;
 import com.yuga.spring_rds.dto.ContactDTO;
 import com.yuga.spring_rds.service.ContactService;
+import com.yuga.spring_rds.service.WhatsAppContactService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class ContactController {
 
   @Autowired private ContactService contactService;
+  @Autowired private WhatsAppContactService whatsAppContactService;
 
   @GetMapping
   public ResponseEntity<List<ContactDTO>> getAllContacts() {
-    List<ContactDTO> contacts = contactService.getContactsByUserId(RequestContext.getUserId());
+    List<ContactDTO> contacts = whatsAppContactService.getAllWhatsAppContacts();
     return ResponseEntity.ok(contacts);
   }
 
