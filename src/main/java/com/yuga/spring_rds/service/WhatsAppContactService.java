@@ -52,4 +52,9 @@ public class WhatsAppContactService {
         .findById(new WhatsAppContactId(contact.getPhoneNumberId(), contact.getWaId()))
         .orElseGet(() -> whatsAppContactRepository.save(contact));
   }
+
+  public void deleteWhatsAppContact(WhatsAppContactId whatsAppContactId) {
+    log.info("Deleting Whatsapp contact: {}", whatsAppContactId);
+    whatsAppContactRepository.deleteById(whatsAppContactId);
+  }
 }

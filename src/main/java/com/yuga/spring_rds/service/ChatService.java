@@ -2,6 +2,7 @@ package com.yuga.spring_rds.service;
 
 import com.yuga.spring_rds.connector.WhatsAppConnector;
 import com.yuga.spring_rds.domain.ChatMessage;
+import com.yuga.spring_rds.domain.WhatsAppContactId;
 import com.yuga.spring_rds.model.api.request.SendMessageRequest;
 import com.yuga.spring_rds.model.api.request.WhatsAppWebhookRequest;
 import com.yuga.spring_rds.model.api.response.SendMessageResponse;
@@ -26,6 +27,7 @@ public class ChatService {
   private String phoneNumberId;
 
   @Autowired private WhatsAppConnector whatsAppConnector;
+  @Autowired private WhatsAppContactService whatsAppContactService;
   @Autowired private ChatMessageRepository chatMessageRepository;
 
   public SendMessageResponse sendMessage(SendMessageRequest request) {
@@ -64,7 +66,7 @@ public class ChatService {
     this.saveChatMessage(chatMessage);
   }
 
-  public void saveMessage(
+  public ChatMessage saveMessage(
       WhatsAppMessageRequestModel requestModel, WhatsAppMessageResponseModel responseModel) {
     ChatMessage chatMessage =
         ChatMessage.builder()
@@ -76,15 +78,22 @@ public class ChatService {
             .direction(ChatMessage.Direction.OUTGOING)
             .messageType(ChatMessage.MessageType.TEXT)
             .build();
-    this.saveChatMessage(chatMessage);
+    return this.saveChatMessage(chatMessage);
   }
 
   public List<ChatMessage> getChatHistory(String waId) {
     return chatMessageRepository.findByWaIdOrderByTimestampAsc(waId);
   }
 
-  private void saveChatMessage(ChatMessage chatMessage) {
+  private ChatMessage saveChatMessage(ChatMessage chatMessage) {
     log.info("Saving chat message: {}", chatMessage);
-    chatMessageRepository.save(chatMessage);
+    return chatMessageRepository.save(chatMessage);
+  }
+
+  public void deleteChatHistory(String waId) {
+    log.info("Deleting chats for waId={}", waId);
+    chatMessageRepository.deleteMessagesByWaIdAndPhoneNumberId(waId, phoneNumberId);
+    whatsAppContactService.deleteWhatsAppContact(
+        WhatsAppContactId.builder().phoneNumberId(phoneNumberId).waId(waId).build());
   }
 }
