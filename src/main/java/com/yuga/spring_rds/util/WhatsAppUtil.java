@@ -10,7 +10,7 @@ public class WhatsAppUtil {
   public static WhatsAppMessageRequestModel buildWhatsAppTemplateMessageRequestModel(
       SendMessageRequest sendMessageRequest, int index) {
     String phoneNumber = sendMessageRequest.getPhoneNumbers().get(index);
-    switch (sendMessageRequest.getRequestType()) {
+    return switch (sendMessageRequest.getRequestType()) {
       case TEMPLATE ->
           WhatsAppMessageRequestModel.builder()
               .messagingProduct("whatsapp")
@@ -22,6 +22,7 @@ public class WhatsAppUtil {
                       .language(new WhatsAppMessageRequestModel.Language("en_US"))
                       .build())
               .build();
+
       case TEXT ->
           WhatsAppMessageRequestModel.builder()
               .messagingProduct("whatsapp")
@@ -34,7 +35,6 @@ public class WhatsAppUtil {
                       .previewUrl(false)
                       .build())
               .build();
-    }
-    return null;
+    };
   }
 }

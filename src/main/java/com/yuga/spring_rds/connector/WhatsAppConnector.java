@@ -1,7 +1,10 @@
 package com.yuga.spring_rds.connector;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppMessageResponseModel;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppTemplateResponseModel;
@@ -15,8 +18,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class WhatsAppConnector {
 
+  public static ObjectMapper mapper;
+
+  static {
+    mapper = new ObjectMapper();
+    mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+  }
+
   @Autowired private WebClient webClient;
-  @Autowired private ObjectMapper mapper;
 
   public WhatsAppMessageResponseModel sendWhatsAppMessage(
       WhatsAppMessageRequestModel whatsAppMessageRequestModel) {
@@ -26,7 +37,7 @@ public class WhatsAppConnector {
     return webClient
         .post()
         .uri("/messages")
-        .bodyValue(whatsAppMessageRequestModel)
+        .bodyValue(mapper.convertValue(whatsAppMessageRequestModel, JsonNode.class))
         .retrieve()
         .onStatus(
             HttpStatusCode::is4xxClientError,

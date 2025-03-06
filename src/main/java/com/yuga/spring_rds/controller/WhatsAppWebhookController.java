@@ -2,6 +2,7 @@ package com.yuga.spring_rds.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yuga.spring_rds.connector.WhatsAppConnector;
 import com.yuga.spring_rds.model.api.request.WhatsAppWebhookRequest;
 import com.yuga.spring_rds.service.WhatsAppWebhookService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/whatsapp/callback")
 public class WhatsAppWebhookController {
 
-  @Autowired private ObjectMapper mapper;
+  private final ObjectMapper mapper = WhatsAppConnector.mapper;
   @Autowired private WhatsAppWebhookService whatsAppWebhookService;
 
   @GetMapping

@@ -1,11 +1,18 @@
 package com.yuga.spring_rds.service;
 
+import com.yuga.spring_rds.connector.WhatsAppConnector;
 import com.yuga.spring_rds.domain.ChatMessage;
+import com.yuga.spring_rds.model.api.request.SendMessageRequest;
 import com.yuga.spring_rds.model.api.request.WhatsAppWebhookRequest;
+import com.yuga.spring_rds.model.api.response.SendMessageResponse;
 import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppMessageResponseModel;
 import com.yuga.spring_rds.repository.ChatMessageRepository;
+import com.yuga.spring_rds.util.WhatsAppUtil;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +25,30 @@ public class ChatService {
   @Value("${whatsapp.phone.number.id}")
   private String phoneNumberId;
 
+  @Autowired private WhatsAppConnector whatsAppConnector;
   @Autowired private ChatMessageRepository chatMessageRepository;
+
+  public SendMessageResponse sendMessage(SendMessageRequest request) {
+    return SendMessageResponse.builder()
+        .responseDetails(
+            IntStream.range(0, request.getPhoneNumbers().size())
+                .mapToObj(
+                    index -> WhatsAppUtil.buildWhatsAppTemplateMessageRequestModel(request, index))
+                .filter(Objects::nonNull)
+                .collect(
+                    Collectors.toMap(
+                        WhatsAppMessageRequestModel::getTo,
+                        waReqModel -> {
+                          try {
+                            var response = whatsAppConnector.sendWhatsAppMessage(waReqModel);
+                            this.saveMessage(waReqModel, response);
+                            return response;
+                          } catch (Exception e) {
+                            return e.getMessage();
+                          }
+                        })))
+        .build();
+  }
 
   public void saveMessage(String phoneNumberId, WhatsAppWebhookRequest.Message message) {
     ChatMessage chatMessage =
