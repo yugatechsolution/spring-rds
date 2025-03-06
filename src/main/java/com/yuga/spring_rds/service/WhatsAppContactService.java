@@ -55,6 +55,8 @@ public class WhatsAppContactService {
 
   public void deleteWhatsAppContact(WhatsAppContactId whatsAppContactId) {
     log.info("Deleting Whatsapp contact: {}", whatsAppContactId);
-    whatsAppContactRepository.deleteById(whatsAppContactId);
+    whatsAppContactRepository
+        .findById(whatsAppContactId)
+        .ifPresent(whatsAppContactRepository::delete);
   }
 }
