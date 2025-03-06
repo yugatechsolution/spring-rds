@@ -53,6 +53,7 @@ public class WhatsAppContactService {
         .orElseGet(() -> whatsAppContactRepository.save(contact));
   }
 
+  @Transactional
   public void deleteWhatsAppContact(WhatsAppContactId whatsAppContactId) {
     log.info("Deleting Whatsapp contact: {}", whatsAppContactId);
     whatsAppContactRepository

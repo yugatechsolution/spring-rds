@@ -10,6 +10,7 @@ import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppMessageResponseModel;
 import com.yuga.spring_rds.repository.ChatMessageRepository;
 import com.yuga.spring_rds.util.WhatsAppUtil;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -90,6 +91,7 @@ public class ChatService {
     return chatMessageRepository.save(chatMessage);
   }
 
+  @Transactional
   public void deleteChatHistory(String waId) {
     log.info("Deleting chats for waId={}", waId);
     chatMessageRepository.deleteMessagesByWaIdAndPhoneNumberId(waId, phoneNumberId);
