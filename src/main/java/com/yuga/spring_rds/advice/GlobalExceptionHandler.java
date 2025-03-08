@@ -1,6 +1,8 @@
 package com.yuga.spring_rds.advice;
 
 import io.jsonwebtoken.JwtException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,12 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<String> handleGenericException(Exception ex) {
-    log.error("Generic Exception Caught: ", ex);
+    log.error(
+        "Generic Exception Caught: {}",
+        Arrays.stream(ex.getStackTrace())
+            .limit(10)
+            .map(StackTraceElement::toString)
+            .collect(Collectors.joining("\n")));
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
         .body("Generic Exception: " + ex.getMessage());
   }
