@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
             .limit(10)
             .map(StackTraceElement::toString)
             .collect(Collectors.joining("\n")));
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body("Generic Exception: " + ex.getMessage());
   }
 }
