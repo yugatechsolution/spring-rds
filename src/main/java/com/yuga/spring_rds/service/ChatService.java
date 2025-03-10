@@ -83,7 +83,7 @@ public class ChatService {
   }
 
   public List<ChatMessage> getChatHistory(String waId) {
-    return chatMessageRepository.findByWaIdOrderByTimestampAsc(waId);
+    return chatMessageRepository.findByWaIdAndPhoneNumberIdOrderByTimestampAsc(waId, phoneNumberId);
   }
 
   private ChatMessage saveChatMessage(ChatMessage chatMessage) {
