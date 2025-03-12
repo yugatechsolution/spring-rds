@@ -33,7 +33,36 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     direction ENUM('INCOMING', 'OUTGOING') NOT NULL,
     FOREIGN KEY (phone_number_id, wa_id) REFERENCES whatsapp_contacts(phone_number_id, wa_id)
 );
+
 --DROP INDEX IF EXISTS idx_chat_wa_id ON chat_messages;
 --CREATE INDEX idx_chat_wa_id ON chat_messages(wa_id);
 --DROP INDEX IF EXISTS idx_chat_wa_id;
 --CREATE INDEX idx_chat_wa_id ON chat_messages(wa_id);
+
+CREATE TABLE IF NOT EXISTS chatbot_messages (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    messaging_product VARCHAR(50) NOT NULL DEFAULT 'whatsapp',
+    recipient_type VARCHAR(50) NOT NULL DEFAULT 'individual',
+    to_number VARCHAR(20) NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    request JSON NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS next_message_mapping (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    parent_message_id BIGINT NOT NULL,
+    action_trigger VARCHAR(50) NOT NULL,
+    next_message_id BIGINT,
+    CONSTRAINT fk_parent_message FOREIGN KEY (parent_message_id)
+        REFERENCES chatbot_messages(id) ON DELETE CASCADE,
+    CONSTRAINT fk_next_message FOREIGN KEY (next_message_id)
+        REFERENCES chatbot_messages(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS chatbot_triggers (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    trigger_text VARCHAR(255) NOT NULL UNIQUE,
+    chatbot_message_id BIGINT NOT NULL,
+    CONSTRAINT fk_chatbot_message FOREIGN KEY (chatbot_message_id)
+        REFERENCES chatbot_messages(id) ON DELETE CASCADE
+);
