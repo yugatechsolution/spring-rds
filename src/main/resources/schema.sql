@@ -41,11 +41,10 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 
 CREATE TABLE IF NOT EXISTS chatbot_messages (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    messaging_product VARCHAR(50) NOT NULL DEFAULT 'whatsapp',
-    recipient_type VARCHAR(50) NOT NULL DEFAULT 'individual',
-    to_number VARCHAR(20) NOT NULL,
-    type VARCHAR(20) NOT NULL,
-    request JSON NOT NULL
+    user_id BIGINT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    request JSON NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS next_message_mapping (

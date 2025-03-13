@@ -2,6 +2,7 @@ package com.yuga.spring_rds.domain.whatsapp;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.domain.whatsapp.messageRequestType.*;
 import com.yuga.spring_rds.util.MessageRequestConverter;
 import jakarta.persistence.*;
@@ -34,14 +35,9 @@ public class ChatbotMessage {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
-  private String messagingProduct = "whatsapp";
-
-  @Column(nullable = false)
-  private String recipientType = "individual";
-
-  @Column(nullable = false)
-  private String to;
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user; // Foreign key to User entity
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)

@@ -1,8 +1,10 @@
 package com.yuga.spring_rds.service;
 
+import com.yuga.spring_rds.advice.RequestContext;
 import com.yuga.spring_rds.domain.whatsapp.ChatbotMessage;
 import com.yuga.spring_rds.domain.whatsapp.ChatbotTrigger;
 import com.yuga.spring_rds.domain.whatsapp.NextMessageMapping;
+import com.yuga.spring_rds.dto.ChatbotMessageDTO;
 import com.yuga.spring_rds.repository.ChatbotMessageRepository;
 import com.yuga.spring_rds.repository.ChatbotTriggerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +38,23 @@ public class ChatbotService {
       System.out.println(indent + "↳ Trigger: " + next.getActionTrigger());
       printMessageFlow(next.getNextMessage(), level + 1);
     }
+  }
+
+  public ChatbotMessageDTO createChatbotFlow(ChatbotMessageDTO chatbotMessageDTO) {
+    ChatbotMessage chatbotMessage =
+        ChatbotMessage.builder()
+            .user(RequestContext.getUser())
+            .type(chatbotMessageDTO.getType())
+            .request(chatbotMessageDTO.getRequest())
+            .build();
+    chatbotMessageRepository.save(chatbotMessage);
+    ChatbotTrigger chatbotTrigger =
+        ChatbotTrigger.builder()
+            .chatbotMessage(chatbotMessage)
+            .triggerText(chatbotMessageDTO.getTriggerText())
+            .build();
+    chatbotTriggerRepository.save(chatbotTrigger);
+    chatbotMessageDTO.setId(chatbotMessage.getId());
+    return chatbotMessageDTO;
   }
 }
