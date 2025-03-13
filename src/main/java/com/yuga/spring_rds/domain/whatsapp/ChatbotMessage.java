@@ -18,6 +18,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@NamedEntityGraph(
+    name = "ChatbotMessage.fullFlow",
+    attributeNodes = {
+      @NamedAttributeNode(value = "nextMessages", subgraph = "nextMessagesSubgraph")
+    },
+    subgraphs = {
+      @NamedSubgraph(
+          name = "nextMessagesSubgraph",
+          attributeNodes = {@NamedAttributeNode("nextMessage")})
+    })
 public class ChatbotMessage {
 
   @Id
@@ -48,7 +58,6 @@ public class ChatbotMessage {
     @JsonSubTypes.Type(value = ImageMessageRequest.class, name = "IMAGE"),
     @JsonSubTypes.Type(value = DocumentMessageRequest.class, name = "DOCUMENT"),
     @JsonSubTypes.Type(value = VideoMessageRequest.class, name = "VIDEO")
-    // Add more message types here
   })
   @Convert(converter = MessageRequestConverter.class)
   private MessageRequest request;
