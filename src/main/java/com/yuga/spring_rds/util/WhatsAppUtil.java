@@ -1,5 +1,6 @@
 package com.yuga.spring_rds.util;
 
+import com.yuga.spring_rds.domain.whatsapp.WhatsAppMessageType;
 import com.yuga.spring_rds.model.api.request.WhatsAppMessageRequest;
 import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
 import lombok.experimental.UtilityClass;
@@ -16,8 +17,8 @@ public class WhatsAppUtil {
               .messagingProduct("whatsapp")
               .recipientType("individual")
               .to(phoneNumber)
-              .type(whatsAppMessageRequest.getType())
-              .request(whatsAppMessageRequest.getRequest())
+              .type(WhatsAppMessageType.text)
+              .text(whatsAppMessageRequest.getText())
               .build();
       default -> null;
     };

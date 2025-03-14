@@ -9,7 +9,7 @@ import com.yuga.spring_rds.SpringRdsApplication;
 import com.yuga.spring_rds.domain.whatsapp.WhatsAppMessageType;
 import com.yuga.spring_rds.domain.whatsapp.messageRequestType.TextMessageRequest;
 import com.yuga.spring_rds.model.api.request.WhatsAppMessageRequest;
-import com.yuga.spring_rds.model.whatsapp.response.WhatsAppMessageResponseModel;
+import com.yuga.spring_rds.model.api.response.SendMessageResponse;
 import com.yuga.spring_rds.service.SendMessageService;
 import com.yuga.spring_rds.util.JwtUtil;
 import com.yuga.spring_rds.util.TestUtil;
@@ -48,21 +48,25 @@ class WhatsAppControllerIT {
 
   @Test
   @Order(1)
-  void testBroadcastMessage_Success() throws Exception {
+  void testTextMessage_Success() throws Exception {
     // Create a valid broadcast message request
+    String phoneNumber = "+916301472014";
     WhatsAppMessageRequest request =
         WhatsAppMessageRequest.builder()
-            .phoneNumbers(List.of("+916301472014"))
+            .phoneNumbers(List.of(phoneNumber))
             .type(WhatsAppMessageType.text)
-            .request(
+            .text(
                 TextMessageRequest.builder()
                     .body("testBroadcastMessage_Success")
                     .previewUrl(true)
                     .build())
             .build();
+    callApiAndAddAssertions(request);
+  }
 
+  private SendMessageResponse callApiAndAddAssertions(WhatsAppMessageRequest request)
+      throws Exception {
     String requestJson = objectMapper.writeValueAsString(request);
-
     // Call the API
     String responseJson =
         mockMvc
@@ -72,14 +76,19 @@ class WhatsAppControllerIT {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestJson))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.messages").isArray())
+            .andExpect(
+                jsonPath(
+                        "$.responseDetails['"
+                            + request.getPhoneNumbers().getFirst()
+                            + "'].messages")
+                    .isArray())
             .andReturn()
             .getResponse()
             .getContentAsString();
 
     // Deserialize response and assert
-    WhatsAppMessageResponseModel response =
-        objectMapper.readValue(responseJson, WhatsAppMessageResponseModel.class);
-    assertThat(response.getMessages()).isNotEmpty();
+    SendMessageResponse response = objectMapper.readValue(responseJson, SendMessageResponse.class);
+    assertThat(response.getResponseDetails()).isNotEmpty();
+    return response;
   }
 }

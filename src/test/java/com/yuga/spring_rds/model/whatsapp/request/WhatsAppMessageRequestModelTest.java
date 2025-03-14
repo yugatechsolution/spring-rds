@@ -35,7 +35,7 @@ public class WhatsAppMessageRequestModelTest {
                   "recipient_type": "individual",
                   "to": "123456789",
                   "type": "text",
-                  "request": {
+                  "text": {
                     "body": "Hello from WhatsApp"
                   }
                 }
@@ -50,8 +50,8 @@ public class WhatsAppMessageRequestModelTest {
     assertThat(result.getType()).isEqualTo(WhatsAppMessageType.text);
 
     // Verify polymorphic deserialization
-    assertThat(result.getRequest()).isInstanceOf(TextMessageRequest.class);
-    TextMessageRequest request = (TextMessageRequest) result.getRequest();
+    assertThat(result.getText()).isNotNull();
+    TextMessageRequest request = result.getText();
     assertThat(request.getBody()).isEqualTo("Hello from WhatsApp");
   }
 
@@ -65,7 +65,7 @@ public class WhatsAppMessageRequestModelTest {
                   "recipient_type": "individual",
                   "to": "123456789",
                   "type": "video",
-                  "request": {
+                  "video": {
                     "link": "https://example.com/audio.mp3"
                   }
                 }
@@ -80,8 +80,8 @@ public class WhatsAppMessageRequestModelTest {
     assertThat(result.getType()).isEqualTo(WhatsAppMessageType.video);
 
     // Verify polymorphic deserialization
-    assertThat(result.getRequest()).isInstanceOf(VideoMessageRequest.class);
-    VideoMessageRequest request = (VideoMessageRequest) result.getRequest();
+    assertThat(result.getVideo()).isNotNull();
+    VideoMessageRequest request = result.getVideo();
     assertThat(request.getLink()).isEqualTo("https://example.com/audio.mp3");
   }
 
@@ -96,7 +96,7 @@ public class WhatsAppMessageRequestModelTest {
             .recipientType("individual")
             .to("123456789")
             .type(WhatsAppMessageType.text)
-            .request(testRequest)
+            .text(testRequest)
             .build();
 
     String jsonResult = objectMapper.writeValueAsString(model);
@@ -116,7 +116,7 @@ public class WhatsAppMessageRequestModelTest {
             .recipientType("individual")
             .to("123456789")
             .type(WhatsAppMessageType.video)
-            .request(audioRequest)
+            .video(audioRequest)
             .build();
 
     String jsonResult = objectMapper.writeValueAsString(model);

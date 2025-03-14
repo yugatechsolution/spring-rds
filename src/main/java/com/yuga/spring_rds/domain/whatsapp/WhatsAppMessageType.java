@@ -4,7 +4,7 @@ public enum WhatsAppMessageType {
   interactive,
   document,
   image,
-  template,
   text,
-  video
+  video,
+  audio
 }

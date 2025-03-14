@@ -5,6 +5,13 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(64) NOT NULL
 );
 
+DROP TABLE IF EXISTS contacts;
+DROP TABLE IF EXISTS whatsapp_contacts;
+DROP TABLE IF EXISTS chat_messages;
+DROP TABLE IF EXISTS chatbot_messages;
+DROP TABLE IF EXISTS next_message_mapping;
+DROP TABLE IF EXISTS chatbot_triggers;
+
 CREATE TABLE IF NOT EXISTS contacts (
     user_id BIGINT NOT NULL,
     phone_number VARCHAR(20) NOT NULL,
@@ -12,6 +19,7 @@ CREATE TABLE IF NOT EXISTS contacts (
     PRIMARY KEY (user_id, phone_number),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
 
 CREATE TABLE IF NOT EXISTS whatsapp_contacts (
     phone_number_id VARCHAR(50) NOT NULL,
@@ -27,9 +35,9 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     wa_id VARCHAR(50) NOT NULL,
     message_id VARCHAR(100) UNIQUE NOT NULL,
     timestamp BIGINT NOT NULL,
-    message_type ENUM('TEXT', 'TEMPLATE', 'FLOW') NOT NULL,
-    message_body TEXT,
-    metadata JSON,
+    message_type VARCHAR(50) NOT NULL, -- Supports dynamic message types
+    message_body TEXT, -- For plain text messages
+    metadata JSON, -- For structured data like buttons, lists, etc.
     direction ENUM('INCOMING', 'OUTGOING') NOT NULL,
     FOREIGN KEY (phone_number_id, wa_id) REFERENCES whatsapp_contacts(phone_number_id, wa_id)
 );

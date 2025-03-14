@@ -1,6 +1,9 @@
 package com.yuga.spring_rds.model.api.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.yuga.spring_rds.domain.whatsapp.WhatsAppMessageType;
+import com.yuga.spring_rds.model.whatsapp.reply.InteractiveReply;
+import com.yuga.spring_rds.model.whatsapp.reply.NonInteractiveReply;
 import java.util.List;
 import lombok.*;
 
@@ -82,17 +85,13 @@ public class WhatsAppWebhookRequest {
   public static class Message {
     private String from;
     private String id;
-    private Text text;
+    private NonInteractiveReply.TextReply text;
+    private NonInteractiveReply.AudioReply audio;
+    private NonInteractiveReply.VideoReply video;
+    private NonInteractiveReply.ImageReply image;
+    private NonInteractiveReply.DocumentReply document;
+    private InteractiveReply interactive;
     private String timestamp;
-    private String type;
-  }
-
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class Text {
-    private String body;
+    private WhatsAppMessageType type;
   }
 }

@@ -1,12 +1,14 @@
 package com.yuga.spring_rds.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.connector.WhatsAppConnector;
 import com.yuga.spring_rds.domain.ChatMessage;
 import com.yuga.spring_rds.domain.WhatsAppContactId;
-import com.yuga.spring_rds.domain.whatsapp.messageRequestType.TextMessageRequest;
 import com.yuga.spring_rds.model.api.request.WhatsAppMessageRequest;
 import com.yuga.spring_rds.model.api.request.WhatsAppWebhookRequest;
 import com.yuga.spring_rds.model.api.response.SendMessageResponse;
+import com.yuga.spring_rds.model.whatsapp.reply.InteractiveReply;
 import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppMessageResponseModel;
 import com.yuga.spring_rds.repository.ChatMessageRepository;
@@ -45,7 +47,7 @@ public class ChatService {
                         waReqModel -> {
                           try {
                             var response = whatsAppConnector.sendWhatsAppMessage(waReqModel);
-                            this.saveMessage(waReqModel, response);
+                            this.saveOutgoingMessage(waReqModel, response);
                             return response;
                           } catch (Exception e) {
                             return e.getMessage();
@@ -54,33 +56,97 @@ public class ChatService {
         .build();
   }
 
-  public void saveMessage(String phoneNumberId, WhatsAppWebhookRequest.Message message) {
-    ChatMessage chatMessage =
+  public void saveIncomingMessage(String phoneNumberId, WhatsAppWebhookRequest.Message message) {
+    ChatMessage.ChatMessageBuilder chatMessageBuilder =
         ChatMessage.builder()
             .phoneNumberId(phoneNumberId)
             .waId(message.getFrom())
             .messageId(message.getId())
             .timestamp(System.currentTimeMillis() / 1000)
-            .messageBody(message.getText().getBody())
-            .direction(ChatMessage.Direction.INCOMING)
-            .messageType(ChatMessage.MessageType.TEXT)
-            .build();
+            .direction(ChatMessage.Direction.INCOMING);
+    switch (message.getType()) {
+      case text ->
+          chatMessageBuilder
+              .messageBody(message.getText().getBody())
+              .messageType(ChatMessage.MessageType.TEXT)
+              .build();
+      case interactive -> {
+        if (message.getInteractive().getType().equals(InteractiveReply.Type.list_reply)) {
+          chatMessageBuilder
+              .messageBody(message.getInteractive().getListReply().getTitle())
+              .metadata(convertToJson(message.getInteractive().getListReply()))
+              .messageType(ChatMessage.MessageType.LIST)
+              .build();
+        } else if (message.getInteractive().getType().equals(InteractiveReply.Type.button_reply)) {
+          chatMessageBuilder
+              .messageBody(message.getInteractive().getButtonReply().getTitle())
+              .metadata(convertToJson(message.getInteractive().getButtonReply()))
+              .messageType(ChatMessage.MessageType.BUTTON)
+              .build();
+        } else {
+          log.info("Interactive type not supported, id={}", message.getId());
+          return;
+        }
+      }
+      case image ->
+          chatMessageBuilder
+              .messageBody("Image received")
+              .metadata(convertToJson(message.getImage()))
+              .messageType(ChatMessage.MessageType.IMAGE)
+              .build();
+
+      case audio ->
+          chatMessageBuilder
+              .messageBody("Audio received")
+              .metadata(convertToJson(message.getAudio()))
+              .messageType(ChatMessage.MessageType.AUDIO)
+              .build();
+
+      case video ->
+          chatMessageBuilder
+              .messageBody("Video received")
+              .metadata(convertToJson(message.getVideo()))
+              .messageType(ChatMessage.MessageType.VIDEO)
+              .build();
+
+      case document ->
+          chatMessageBuilder
+              .messageBody("Document received")
+              .metadata(convertToJson(message.getDocument()))
+              .messageType(ChatMessage.MessageType.DOCUMENT)
+              .build();
+
+      default -> {
+        log.info("Unsupported message type: {}", message.getType());
+        return;
+      }
+    }
+    ChatMessage chatMessage = chatMessageBuilder.build();
     this.saveChatMessage(chatMessage);
   }
 
-  public ChatMessage saveMessage(
+  public void saveOutgoingMessage(
       WhatsAppMessageRequestModel requestModel, WhatsAppMessageResponseModel responseModel) {
-    ChatMessage chatMessage =
+
+    ChatMessage.ChatMessageBuilder builder =
         ChatMessage.builder()
             .phoneNumberId(phoneNumberId)
             .waId(responseModel.getContacts().getFirst().getWaId())
             .messageId(responseModel.getMessages().getFirst().getId())
             .timestamp(System.currentTimeMillis() / 1000)
-            .messageBody(((TextMessageRequest) requestModel.getRequest()).getBody())
-            .direction(ChatMessage.Direction.OUTGOING)
-            .messageType(ChatMessage.MessageType.TEXT)
-            .build();
-    return this.saveChatMessage(chatMessage);
+            .direction(ChatMessage.Direction.OUTGOING);
+
+    switch (requestModel.getType()) {
+      case text ->
+          builder
+              .messageType(ChatMessage.MessageType.TEXT)
+              .messageBody(requestModel.getText().getBody());
+      default -> {
+        log.info("Unsupported message type: {}", requestModel.getType());
+        return;
+      }
+    }
+    this.saveChatMessage(builder.build());
   }
 
   public List<ChatMessage> getChatHistory(String waId) {
@@ -98,5 +164,14 @@ public class ChatService {
     chatMessageRepository.deleteMessagesByWaIdAndPhoneNumberId(waId, phoneNumberId);
     whatsAppContactService.deleteWhatsAppContact(
         WhatsAppContactId.builder().phoneNumberId(phoneNumberId).waId(waId).build());
+  }
+
+  private String convertToJson(Object data) {
+    try {
+      return new ObjectMapper().writeValueAsString(data);
+    } catch (JsonProcessingException e) {
+      log.error("Failed to convert object to JSON", e);
+      return null;
+    }
   }
 }

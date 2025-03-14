@@ -4,6 +4,7 @@ import com.yuga.spring_rds.advice.RequestContext;
 import com.yuga.spring_rds.domain.whatsapp.ChatbotMessage;
 import com.yuga.spring_rds.domain.whatsapp.ChatbotTrigger;
 import com.yuga.spring_rds.domain.whatsapp.NextMessageMapping;
+import com.yuga.spring_rds.domain.whatsapp.messageRequestType.MessageRequest;
 import com.yuga.spring_rds.dto.ChatbotMessageDTO;
 import com.yuga.spring_rds.repository.ChatbotMessageRepository;
 import com.yuga.spring_rds.repository.ChatbotTriggerRepository;
@@ -45,7 +46,7 @@ public class ChatbotService {
         ChatbotMessage.builder()
             .user(RequestContext.getUser())
             .type(chatbotMessageDTO.getType())
-            .request(chatbotMessageDTO.getRequest())
+            .request(getMessageRequest(chatbotMessageDTO))
             .build();
     chatbotMessageRepository.save(chatbotMessage);
     ChatbotTrigger chatbotTrigger =
@@ -56,5 +57,13 @@ public class ChatbotService {
     chatbotTriggerRepository.save(chatbotTrigger);
     chatbotMessageDTO.setId(chatbotMessage.getId());
     return chatbotMessageDTO;
+  }
+
+  private MessageRequest getMessageRequest(ChatbotMessageDTO chatbotMessageDTO) {
+    return switch (chatbotMessageDTO.getType()) {
+      case text -> chatbotMessageDTO.getText();
+      case video -> chatbotMessageDTO.getVideo();
+      default -> null;
+    };
   }
 }

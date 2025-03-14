@@ -35,7 +35,9 @@ public class WhatsAppWebhookService {
                           // Save messages
                           value
                               .getMessages()
-                              .forEach(message -> chatService.saveMessage(phoneNumberId, message));
+                              .forEach(
+                                  message ->
+                                      chatService.saveIncomingMessage(phoneNumberId, message));
                         }));
   }
 }

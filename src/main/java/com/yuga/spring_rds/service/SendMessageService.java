@@ -33,7 +33,7 @@ public class SendMessageService {
                         waReqModel -> {
                           try {
                             var response = whatsAppConnector.sendWhatsAppMessage(waReqModel);
-                            chatService.saveMessage(waReqModel, response);
+                            chatService.saveOutgoingMessage(waReqModel, response);
                             return response;
                           } catch (Exception e) {
                             return e.getMessage();
