@@ -41,7 +41,9 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     message_body TEXT, -- For plain text messages
     metadata JSON, -- For structured data like buttons, lists, etc.
     direction ENUM('INCOMING', 'OUTGOING') NOT NULL,
-    FOREIGN KEY (phone_number_id, wa_id) REFERENCES whatsapp_contacts(phone_number_id, wa_id)
+    status VARCHAR(20), -- SENT, DELIVERED, READ
+    status_timestamp BIGINT, -- Timestamp for status update
+    FOREIGN KEY (phone_number_id, wa_id) REFERENCES whatsapp_contacts(phone_number_id, wa_id) ON DELETE CASCADE
 );
 
 --DROP INDEX IF EXISTS idx_chat_wa_id ON chat_messages;
