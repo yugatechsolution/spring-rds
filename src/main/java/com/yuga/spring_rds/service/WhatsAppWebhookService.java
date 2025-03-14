@@ -4,6 +4,7 @@ import com.yuga.spring_rds.model.api.request.WhatsAppWebhookRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
@@ -38,19 +39,22 @@ public class WhatsAppWebhookService {
                           }
 
                           // Save contacts
-                          value
-                              .getContacts()
-                              .forEach(contact -> saveContact(phoneNumberId, contact));
+                          if (!CollectionUtils.isEmpty(value.getContacts()))
+                            value
+                                .getContacts()
+                                .forEach(contact -> saveContact(phoneNumberId, contact));
 
                           // Save messages
-                          value
-                              .getMessages()
-                              .forEach(message -> saveMessage(phoneNumberId, message));
+                          if (!CollectionUtils.isEmpty(value.getMessages()))
+                            value
+                                .getMessages()
+                                .forEach(message -> saveMessage(phoneNumberId, message));
 
                           // Handle statuses
-                          value
-                              .getStatuses()
-                              .forEach(status -> handleStatus(phoneNumberId, status));
+                          if (!CollectionUtils.isEmpty(value.getStatuses()))
+                            value
+                                .getStatuses()
+                                .forEach(status -> handleStatus(phoneNumberId, status));
                         }));
   }
 
