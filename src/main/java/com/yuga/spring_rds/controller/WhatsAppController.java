@@ -1,6 +1,6 @@
 package com.yuga.spring_rds.controller;
 
-import com.yuga.spring_rds.model.api.request.SendMessageRequest;
+import com.yuga.spring_rds.model.api.request.WhatsAppMessageRequest;
 import com.yuga.spring_rds.model.api.response.SendMessageResponse;
 import com.yuga.spring_rds.service.ChatService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +15,9 @@ public class WhatsAppController {
 
   @Autowired private ChatService chatService;
 
-  @PostMapping("/message")
+  @PostMapping("/send")
   public ResponseEntity<SendMessageResponse> broadcastMessage(
-      @RequestBody SendMessageRequest request) {
+      @RequestBody WhatsAppMessageRequest request) {
     SendMessageResponse response = chatService.sendMessage(request);
     return ResponseEntity.ok(response);
   }

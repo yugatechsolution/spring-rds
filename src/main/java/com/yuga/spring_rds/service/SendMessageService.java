@@ -1,7 +1,7 @@
 package com.yuga.spring_rds.service;
 
 import com.yuga.spring_rds.connector.WhatsAppConnector;
-import com.yuga.spring_rds.model.api.request.SendMessageRequest;
+import com.yuga.spring_rds.model.api.request.WhatsAppMessageRequest;
 import com.yuga.spring_rds.model.api.response.SendMessageResponse;
 import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppTemplateResponseModel;
@@ -20,7 +20,7 @@ public class SendMessageService {
   @Autowired private WhatsAppConnector whatsAppConnector;
   @Autowired private ChatService chatService;
 
-  public SendMessageResponse sendMessage(SendMessageRequest request) {
+  public SendMessageResponse sendMessage(WhatsAppMessageRequest request) {
     return SendMessageResponse.builder()
         .responseDetails(
             IntStream.range(0, request.getPhoneNumbers().size())

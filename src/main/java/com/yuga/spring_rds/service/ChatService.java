@@ -3,7 +3,8 @@ package com.yuga.spring_rds.service;
 import com.yuga.spring_rds.connector.WhatsAppConnector;
 import com.yuga.spring_rds.domain.ChatMessage;
 import com.yuga.spring_rds.domain.WhatsAppContactId;
-import com.yuga.spring_rds.model.api.request.SendMessageRequest;
+import com.yuga.spring_rds.domain.whatsapp.messageRequestType.TextMessageRequest;
+import com.yuga.spring_rds.model.api.request.WhatsAppMessageRequest;
 import com.yuga.spring_rds.model.api.request.WhatsAppWebhookRequest;
 import com.yuga.spring_rds.model.api.response.SendMessageResponse;
 import com.yuga.spring_rds.model.whatsapp.request.WhatsAppMessageRequestModel;
@@ -31,7 +32,7 @@ public class ChatService {
   @Autowired private WhatsAppContactService whatsAppContactService;
   @Autowired private ChatMessageRepository chatMessageRepository;
 
-  public SendMessageResponse sendMessage(SendMessageRequest request) {
+  public SendMessageResponse sendMessage(WhatsAppMessageRequest request) {
     return SendMessageResponse.builder()
         .responseDetails(
             IntStream.range(0, request.getPhoneNumbers().size())
@@ -75,7 +76,7 @@ public class ChatService {
             .waId(responseModel.getContacts().getFirst().getWaId())
             .messageId(responseModel.getMessages().getFirst().getId())
             .timestamp(System.currentTimeMillis() / 1000)
-            .messageBody(requestModel.getText().getBody())
+            .messageBody(((TextMessageRequest) requestModel.getRequest()).getBody())
             .direction(ChatMessage.Direction.OUTGOING)
             .messageType(ChatMessage.MessageType.TEXT)
             .build();

@@ -6,7 +6,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.SpringRdsApplication;
-import com.yuga.spring_rds.model.api.request.SendMessageRequest;
+import com.yuga.spring_rds.domain.whatsapp.WhatsAppMessageType;
+import com.yuga.spring_rds.domain.whatsapp.messageRequestType.TextMessageRequest;
+import com.yuga.spring_rds.model.api.request.WhatsAppMessageRequest;
 import com.yuga.spring_rds.model.whatsapp.response.WhatsAppMessageResponseModel;
 import com.yuga.spring_rds.service.SendMessageService;
 import com.yuga.spring_rds.util.JwtUtil;
@@ -48,13 +50,14 @@ class WhatsAppControllerIT {
   @Order(1)
   void testBroadcastMessage_Success() throws Exception {
     // Create a valid broadcast message request
-    SendMessageRequest request =
-        SendMessageRequest.builder()
+    WhatsAppMessageRequest request =
+        WhatsAppMessageRequest.builder()
             .phoneNumbers(List.of("+916301472014"))
-            .requestType(SendMessageRequest.RequestType.TEMPLATE)
-            .templateMessageRequest(
-                SendMessageRequest.TemplateMessageRequest.builder()
-                    .templateName("hello_world")
+            .type(WhatsAppMessageType.text)
+            .request(
+                TextMessageRequest.builder()
+                    .body("testBroadcastMessage_Success")
+                    .previewUrl(true)
                     .build())
             .build();
 
@@ -64,7 +67,7 @@ class WhatsAppControllerIT {
     String responseJson =
         mockMvc
             .perform(
-                post("/api/whatsapp/message")
+                post("/api/whatsapp/send")
                     .header("Authorization", jwtToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestJson))

@@ -1,16 +1,17 @@
 package com.yuga.spring_rds.model.whatsapp.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.yuga.spring_rds.domain.whatsapp.util.BaseWhatsAppMessageRequest;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WhatsAppMessageRequestModel {
+public class WhatsAppMessageRequestModel extends BaseWhatsAppMessageRequest {
 
   @JsonProperty("messaging_product")
   private String messagingProduct;
@@ -19,35 +20,4 @@ public class WhatsAppMessageRequestModel {
   private String recipientType;
 
   private String to;
-  private String type;
-  private Template template;
-  private Text text;
-
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class Template {
-    private String name;
-    private Language language;
-  }
-
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class Text {
-    private String body;
-
-    @JsonProperty("preview_url")
-    private boolean previewUrl;
-  }
-
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class Language {
-    private String code;
-  }
 }

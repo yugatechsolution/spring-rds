@@ -1,21 +1,16 @@
 package com.yuga.spring_rds.dto;
 
-import com.yuga.spring_rds.domain.whatsapp.WhatsAppMessageType;
 import com.yuga.spring_rds.domain.whatsapp.messageRequestType.*;
+import com.yuga.spring_rds.model.api.request.WhatsAppMessageRequest;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class ChatbotMessageDTO {
-  private Long id;
-  private String phoneNumber;
-  private WhatsAppMessageType type;
-  private MessageRequest request;
+@SuperBuilder
+public class ChatbotMessageDTO extends WhatsAppMessageRequest {
   private String triggerText;
 }
