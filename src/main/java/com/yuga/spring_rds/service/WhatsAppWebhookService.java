@@ -8,11 +8,15 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class WhatsAppWebhookService {
-
   @Autowired private WhatsAppContactService whatsAppContactService;
   @Autowired private ChatService chatService;
 
   public void processIncomingMessage(WhatsAppWebhookRequest request) {
+    if (request == null || request.getEntry() == null) {
+      log.warn("Received null or empty webhook request");
+      return;
+    }
+
     request
         .getEntry()
         .forEach(
@@ -21,23 +25,57 @@ public class WhatsAppWebhookService {
                     .getChanges()
                     .forEach(
                         change -> {
-                          WhatsAppWebhookRequest.Value value = change.getValue();
-                          String phoneNumberId = value.getMetadata().getPhoneNumberId();
+                          var value = change.getValue();
+                          if (value == null || value.getMetadata() == null) {
+                            log.warn("Invalid value or metadata in change");
+                            return;
+                          }
 
-                          // Save contact (Ensure uniqueness per phoneNumberId)
+                          String phoneNumberId = value.getMetadata().getPhoneNumberId();
+                          if (phoneNumberId == null) {
+                            log.warn("Phone number ID is null in metadata");
+                            return;
+                          }
+
+                          // Save contacts
                           value
                               .getContacts()
-                              .forEach(
-                                  contact -> {
-                                    whatsAppContactService.saveContact(phoneNumberId, contact);
-                                  });
+                              .forEach(contact -> saveContact(phoneNumberId, contact));
 
                           // Save messages
                           value
                               .getMessages()
-                              .forEach(
-                                  message ->
-                                      chatService.saveIncomingMessage(phoneNumberId, message));
+                              .forEach(message -> saveMessage(phoneNumberId, message));
+
+                          // Handle statuses
+                          value
+                              .getStatuses()
+                              .forEach(status -> handleStatus(phoneNumberId, status));
                         }));
+  }
+
+  private void saveContact(String phoneNumberId, WhatsAppWebhookRequest.Contact contact) {
+    try {
+      whatsAppContactService.saveContact(phoneNumberId, contact);
+    } catch (Exception e) {
+      log.error("Failed to save contact for phoneNumberId={}", phoneNumberId, e);
+    }
+  }
+
+  private void saveMessage(String phoneNumberId, WhatsAppWebhookRequest.Message message) {
+    try {
+      chatService.saveIncomingMessage(phoneNumberId, message);
+    } catch (Exception e) {
+      log.error("Failed to save message for phoneNumberId={}", phoneNumberId, e);
+    }
+  }
+
+  private void handleStatus(String phoneNumberId, WhatsAppWebhookRequest.Status status) {
+    try {
+      log.info("Received status for phoneNumberId={}, status={}", phoneNumberId, status);
+      chatService.updateMessageStatus(status.getId(), status.getStatus().toUpperCase());
+    } catch (Exception e) {
+      log.error("Failed to handle status for phoneNumberId={}", phoneNumberId, e);
+    }
   }
 }

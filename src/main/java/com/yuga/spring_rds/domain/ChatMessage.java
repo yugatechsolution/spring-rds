@@ -47,6 +47,12 @@ public class ChatMessage {
   @Column(columnDefinition = "JSON") // Store complex types (like buttons, lists, etc.)
   private String metadata;
 
+  @Column(nullable = true) // Status may not always be present
+  private String status;
+
+  @Column(nullable = true) // Status timestamp is nullable because status may not always be updated
+  private Long statusTimestamp;
+
   public enum MessageType {
     TEXT,
     BUTTON,
@@ -61,5 +67,13 @@ public class ChatMessage {
   public enum Direction {
     INCOMING,
     OUTGOING
+  }
+
+  // Enum for status types
+  public enum Status {
+    SENT,
+    DELIVERED,
+    READ,
+    FAILED
   }
 }

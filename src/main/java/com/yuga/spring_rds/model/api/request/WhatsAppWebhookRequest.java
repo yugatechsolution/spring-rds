@@ -46,6 +46,7 @@ public class WhatsAppWebhookRequest {
     private Metadata metadata;
     private List<Contact> contacts;
     private List<Message> messages;
+    private List<Status> statuses;
   }
 
   @Data
@@ -93,5 +94,52 @@ public class WhatsAppWebhookRequest {
     private InteractiveReply interactive;
     private String timestamp;
     private WhatsAppMessageType type;
+  }
+
+  // ✅ Added Status class
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class Status {
+    private String id;
+    private String recipientId;
+    private String status; // delivered, read, failed, sent
+    private Long timestamp;
+    private Conversation conversation;
+    private Pricing pricing;
+    private Error error;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Conversation {
+      private String id;
+      private String originType; // user_initiated, business_initiated, referral_conversion
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Pricing {
+      private String pricingModel; // conversation-based
+      private String category; // marketing, utility, authentication
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Error {
+      private int code;
+      private String title;
+      private String message;
+    }
   }
 }

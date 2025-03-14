@@ -8,5 +8,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
   List<ChatMessage> findByWaIdAndPhoneNumberIdOrderByTimestampAsc(
       String waId, String phoneNumberId);
 
+  ChatMessage findByMessageId(String messageId);
+
   void deleteMessagesByWaIdAndPhoneNumberId(String waId, String phoneNumberId);
 }

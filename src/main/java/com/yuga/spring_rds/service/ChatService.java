@@ -68,23 +68,20 @@ public class ChatService {
       case text ->
           chatMessageBuilder
               .messageBody(message.getText().getBody())
-              .messageType(ChatMessage.MessageType.TEXT)
-              .build();
+              .messageType(ChatMessage.MessageType.TEXT);
       case interactive -> {
         if (message.getInteractive().getType().equals(InteractiveReply.Type.list_reply)) {
           chatMessageBuilder
               .messageBody(message.getInteractive().getListReply().getTitle())
               .metadata(convertToJson(message.getInteractive().getListReply()))
-              .messageType(ChatMessage.MessageType.LIST)
-              .build();
+              .messageType(ChatMessage.MessageType.LIST);
         } else if (message.getInteractive().getType().equals(InteractiveReply.Type.button_reply)) {
           chatMessageBuilder
               .messageBody(message.getInteractive().getButtonReply().getTitle())
               .metadata(convertToJson(message.getInteractive().getButtonReply()))
-              .messageType(ChatMessage.MessageType.BUTTON)
-              .build();
+              .messageType(ChatMessage.MessageType.BUTTON);
         } else {
-          log.info("Interactive type not supported, id={}", message.getId());
+          log.info("Unsupported interactive type: {}", message.getInteractive().getType());
           return;
         }
       }
@@ -92,35 +89,28 @@ public class ChatService {
           chatMessageBuilder
               .messageBody("Image received")
               .metadata(convertToJson(message.getImage()))
-              .messageType(ChatMessage.MessageType.IMAGE)
-              .build();
-
+              .messageType(ChatMessage.MessageType.IMAGE);
       case audio ->
           chatMessageBuilder
               .messageBody("Audio received")
               .metadata(convertToJson(message.getAudio()))
-              .messageType(ChatMessage.MessageType.AUDIO)
-              .build();
-
+              .messageType(ChatMessage.MessageType.AUDIO);
       case video ->
           chatMessageBuilder
               .messageBody("Video received")
               .metadata(convertToJson(message.getVideo()))
-              .messageType(ChatMessage.MessageType.VIDEO)
-              .build();
-
+              .messageType(ChatMessage.MessageType.VIDEO);
       case document ->
           chatMessageBuilder
               .messageBody("Document received")
               .metadata(convertToJson(message.getDocument()))
-              .messageType(ChatMessage.MessageType.DOCUMENT)
-              .build();
-
+              .messageType(ChatMessage.MessageType.DOCUMENT);
       default -> {
         log.info("Unsupported message type: {}", message.getType());
         return;
       }
     }
+
     ChatMessage chatMessage = chatMessageBuilder.build();
     this.saveChatMessage(chatMessage);
   }
@@ -146,7 +136,22 @@ public class ChatService {
         return;
       }
     }
+
+    builder.status(ChatMessage.Status.SENT.name());
+    builder.statusTimestamp(System.currentTimeMillis() / 1000);
     this.saveChatMessage(builder.build());
+  }
+
+  public void updateMessageStatus(String messageId, String status) {
+    ChatMessage chatMessage = chatMessageRepository.findByMessageId(messageId);
+    if (chatMessage != null) {
+      chatMessage.setStatus(status);
+      chatMessage.setStatusTimestamp(System.currentTimeMillis() / 1000);
+      chatMessageRepository.save(chatMessage);
+      log.info("Updated message status to {} for messageId={}", status, messageId);
+    } else {
+      log.warn("Message with ID {} not found for status update", messageId);
+    }
   }
 
   public List<ChatMessage> getChatHistory(String waId) {
