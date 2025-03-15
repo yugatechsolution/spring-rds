@@ -1,7 +1,6 @@
 package com.yuga.spring_rds.service;
 
 import com.yuga.spring_rds.domain.whatsapp.ChatbotMessage;
-import com.yuga.spring_rds.domain.whatsapp.WhatsAppMessageType;
 import com.yuga.spring_rds.model.api.request.WhatsAppWebhookRequest;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +17,27 @@ public class WhatsAppWebhookMessageHandler {
   public void handleMessage(String phoneNumberId, WhatsAppWebhookRequest.Message message) {
     try {
       chatService.saveIncomingMessage(phoneNumberId, message);
-      if (message.getType().equals(WhatsAppMessageType.text)) {
-        ChatbotMessage chatbotMessage =
-            chatbotService.getFirstMessageOfFlowIfExists(message.getText().getBody());
-        if (Objects.nonNull(chatbotMessage))
-          chatbotMessagingService.sendMessage(chatbotMessage, message.getFrom());
+      switch (message.getType()) {
+        case text -> {
+          ChatbotMessage chatbotMessage =
+              chatbotService.getFirstMessageOfFlowIfExists(message.getText().getBody());
+          if (Objects.nonNull(chatbotMessage))
+            chatbotMessagingService.sendMessage(chatbotMessage, message.getFrom());
+        }
+        case interactive -> {
+          switch (message.getInteractive().getType()) {
+            case list_reply -> {
+              String messageId = message.getContext().getId();
+              ChatbotMessage parentChatbotMessage =
+                  chatbotMessagingService.getChatbotMessageByMessageId(messageId);
+              ChatbotMessage nextChatbotMessage =
+                  chatbotMessagingService.getNextChatbotMessage(
+                      parentChatbotMessage, message.getInteractive().getListReply().getId());
+              if (Objects.nonNull(nextChatbotMessage))
+                chatbotMessagingService.sendMessage(nextChatbotMessage, message.getFrom());
+            }
+          }
+        }
       }
     } catch (Exception e) {
       log.error("Failed to save message for phoneNumberId={}", phoneNumberId, e);

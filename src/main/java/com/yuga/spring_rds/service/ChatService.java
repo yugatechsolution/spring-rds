@@ -117,7 +117,7 @@ public class ChatService {
     this.saveChatMessage(chatMessage);
   }
 
-  public void saveOutgoingMessage(
+  public ChatMessage saveOutgoingMessage(
       WhatsAppMessageRequestModel requestModel, WhatsAppMessageResponseModel responseModel) {
 
     ChatMessage.ChatMessageBuilder builder =
@@ -147,13 +147,13 @@ public class ChatService {
       }
       default -> {
         log.info("Unsupported message type: {}", requestModel.getType());
-        return;
+        return null;
       }
     }
 
     builder.status(ChatMessage.Status.SENT.name());
     builder.statusTimestamp(System.currentTimeMillis() / 1000);
-    this.saveChatMessage(builder.build());
+    return this.saveChatMessage(builder.build());
   }
 
   public void updateMessageStatus(String messageId, String status) {

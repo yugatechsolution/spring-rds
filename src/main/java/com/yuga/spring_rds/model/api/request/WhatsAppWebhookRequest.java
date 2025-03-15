@@ -94,6 +94,17 @@ public class WhatsAppWebhookRequest {
     private InteractiveReply interactive;
     private String timestamp;
     private WhatsAppMessageType type;
+    private Context context;
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class Context {
+    private String from;
+    private String id;
   }
 
   // ✅ Added Status class
