@@ -1,5 +1,5 @@
 {
-  "triggerText": "Hello, this is a chatbot interactive list message",
+  "triggerText": "Hi",
   "whatsAppMessageRequests": [
     {
       "type": "interactive",

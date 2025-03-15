@@ -28,10 +28,14 @@ public class ChatbotService {
   @Autowired private ChatbotMessageRepository chatbotMessageRepository;
   @Autowired private NextMessageMappingRepository nextMessageMappingRepository;
 
+  public ChatbotMessage getFirstMessageOfFlowIfExists(String triggerText) {
+    return chatbotTriggerRepository.findStartingMessage(triggerText).orElse(null);
+  }
+
   public ChatbotFlowDTO getFullFlow(String triggerText) {
     ChatbotTrigger trigger =
         chatbotTriggerRepository
-            .findByTriggerText(triggerText)
+            .findFullFlowByTriggerText(triggerText)
             .orElseThrow(() -> new EntityNotFoundException("Invalid triggerText"));
 
     ChatbotMessage startingMessage = trigger.getStartingMessage();

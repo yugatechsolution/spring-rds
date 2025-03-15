@@ -11,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 public class WhatsAppWebhookService {
   @Autowired private WhatsAppContactService whatsAppContactService;
   @Autowired private ChatService chatService;
+  @Autowired private WhatsAppWebhookMessageHandler whatsAppWebhookMessageHandler;
 
   public void processIncomingMessage(WhatsAppWebhookRequest request) {
     if (request == null || request.getEntry() == null) {
@@ -48,7 +49,10 @@ public class WhatsAppWebhookService {
                           if (!CollectionUtils.isEmpty(value.getMessages()))
                             value
                                 .getMessages()
-                                .forEach(message -> saveMessage(phoneNumberId, message));
+                                .forEach(
+                                    message ->
+                                        whatsAppWebhookMessageHandler.handleMessage(
+                                            phoneNumberId, message));
 
                           // Handle statuses
                           if (!CollectionUtils.isEmpty(value.getStatuses()))
@@ -63,14 +67,6 @@ public class WhatsAppWebhookService {
       whatsAppContactService.saveContact(phoneNumberId, contact);
     } catch (Exception e) {
       log.error("Failed to save contact for phoneNumberId={}", phoneNumberId, e);
-    }
-  }
-
-  private void saveMessage(String phoneNumberId, WhatsAppWebhookRequest.Message message) {
-    try {
-      chatService.saveIncomingMessage(phoneNumberId, message);
-    } catch (Exception e) {
-      log.error("Failed to save message for phoneNumberId={}", phoneNumberId, e);
     }
   }
 
