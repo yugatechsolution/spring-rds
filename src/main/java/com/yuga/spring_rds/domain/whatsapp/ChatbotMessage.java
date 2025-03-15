@@ -1,5 +1,6 @@
 package com.yuga.spring_rds.domain.whatsapp;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.util.MessageRequestConverter;
@@ -46,6 +47,7 @@ public class ChatbotMessage {
   private JsonNode request;
 
   @OneToMany(mappedBy = "parentMessage", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonManagedReference
   private List<NextMessageMapping> nextMessages = new ArrayList<>();
 
   @ManyToOne
