@@ -1,5 +1,7 @@
 package com.yuga.spring_rds.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.yuga.spring_rds.domain.whatsapp.ChatbotMessage;
@@ -16,7 +18,8 @@ import org.hibernate.annotations.CreationTimestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "chat_message_mappings")
+@Table(name = "chat_message_mapping")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ChatMessageMapping {
 
