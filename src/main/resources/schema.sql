@@ -80,11 +80,11 @@ CREATE TABLE IF NOT EXISTS next_message_mapping (
 -- ✅ Create chat_message_mapping
 CREATE TABLE IF NOT EXISTS chat_message_mapping (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    chat_message_id BIGINT NOT NULL,
+    chat_message_id VARCHAR(100) NOT NULL, -- Change type to match message_id type
     chatbot_message_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_chat_message FOREIGN KEY (chat_message_id)
-        REFERENCES chat_messages(id) ON DELETE CASCADE,
+        REFERENCES chat_messages(message_id) ON DELETE CASCADE,
     CONSTRAINT fk_chatbot_message_in_mapping FOREIGN KEY (chatbot_message_id)
         REFERENCES chatbot_messages(id) ON DELETE SET NULL
 );
