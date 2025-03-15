@@ -33,7 +33,7 @@ class ChatbotControllerIT {
   @Autowired private ObjectMapper objectMapper;
 
   private String jwtToken;
-  private static String triggerText = "Test Trigger";
+  private static String triggerText = "Hello, this is a chatbot interactive list message";
 
   @BeforeEach
   void setUp() {
@@ -89,7 +89,7 @@ class ChatbotControllerIT {
 
     ChatbotFlowDTO response = objectMapper.readValue(responseJson, ChatbotFlowDTO.class);
 
-    log.info("Fetched chatbot flow: {}", response);
+    log.info("Fetched chatbot flow: {}", responseJson);
 
     assertThat(response).isNotNull();
     assertThat(response.getTriggerText()).isEqualTo(triggerText);

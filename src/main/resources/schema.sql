@@ -79,6 +79,19 @@ CREATE TABLE IF NOT EXISTS next_message_mapping (
 );
 
 -- Add the foreign key to chatbot_triggers after chatbot_messages is created
-ALTER TABLE chatbot_triggers
-ADD CONSTRAINT fk_chatbot_message FOREIGN KEY (chatbot_message_id)
-REFERENCES chatbot_messages(id) ON DELETE CASCADE;
+SET @constraint_exists = (
+    SELECT COUNT(*)
+    FROM information_schema.table_constraints
+    WHERE constraint_name = 'fk_chatbot_message'
+      AND table_name = 'chatbot_triggers'
+);
+
+SET @query = IF(
+    @constraint_exists = 0,
+    'ALTER TABLE chatbot_triggers ADD CONSTRAINT fk_chatbot_message FOREIGN KEY (chatbot_message_id) REFERENCES chatbot_messages(id) ON DELETE CASCADE;',
+    'SELECT "Constraint already exists"'
+);
+
+PREPARE stmt FROM @query;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
