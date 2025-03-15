@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS chat_message_mapping (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_chat_message FOREIGN KEY (chat_message_id)
         REFERENCES chat_messages(id) ON DELETE CASCADE,
-    CONSTRAINT fk_chatbot_message FOREIGN KEY (chatbot_message_id)
+    CONSTRAINT fk_chatbot_message_in_mapping FOREIGN KEY (chatbot_message_id)
         REFERENCES chatbot_messages(id) ON DELETE SET NULL
 );
 
