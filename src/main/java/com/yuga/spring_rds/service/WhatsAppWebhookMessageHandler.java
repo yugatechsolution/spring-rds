@@ -2,7 +2,6 @@ package com.yuga.spring_rds.service;
 
 import com.yuga.spring_rds.domain.whatsapp.ChatbotMessage;
 import com.yuga.spring_rds.model.api.request.WhatsAppWebhookRequest;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,7 @@ public class WhatsAppWebhookMessageHandler {
         case text -> {
           ChatbotMessage chatbotMessage =
               chatbotService.getFirstMessageOfFlowIfExists(message.getText().getBody());
-          if (Objects.nonNull(chatbotMessage))
-            chatbotMessagingService.sendMessage(chatbotMessage, message.getFrom());
+          chatbotMessagingService.sendMessage(chatbotMessage, message.getFrom());
         }
         case interactive -> {
           switch (message.getInteractive().getType()) {
@@ -33,8 +31,7 @@ public class WhatsAppWebhookMessageHandler {
               ChatbotMessage nextChatbotMessage =
                   chatbotMessagingService.getNextChatbotMessage(
                       parentChatbotMessage, message.getInteractive().getListReply().getId());
-              if (Objects.nonNull(nextChatbotMessage))
-                chatbotMessagingService.sendMessage(nextChatbotMessage, message.getFrom());
+              chatbotMessagingService.sendMessage(nextChatbotMessage, message.getFrom());
             }
           }
         }

@@ -29,6 +29,7 @@ public class ChatbotMessagingService {
   @Autowired private NextMessageMappingRepository nextMessageMappingRepository;
 
   public void sendMessage(ChatbotMessage chatbotMessage, String recipientPhoneNumber) {
+    if (Objects.isNull(chatbotMessage)) return;
     WhatsAppMessageRequestModel whatsAppMessageRequestModel =
         WhatsAppMessageRequestModel.builder()
             .messagingProduct("whatsapp")

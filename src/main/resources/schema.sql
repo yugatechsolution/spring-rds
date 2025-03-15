@@ -19,7 +19,6 @@ CREATE TABLE IF NOT EXISTS contacts (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS whatsapp_contacts (
     phone_number_id VARCHAR(50) NOT NULL,
     wa_id VARCHAR(50) NOT NULL,
@@ -78,7 +77,19 @@ CREATE TABLE IF NOT EXISTS next_message_mapping (
         REFERENCES chatbot_messages(id) ON DELETE SET NULL
 );
 
--- Add the foreign key to chatbot_triggers after chatbot_messages is created
+-- ✅ Create chat_message_mapping
+CREATE TABLE IF NOT EXISTS chat_message_mapping (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    chat_message_id BIGINT NOT NULL,
+    chatbot_message_id BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_chat_message FOREIGN KEY (chat_message_id)
+        REFERENCES chat_messages(id) ON DELETE CASCADE,
+    CONSTRAINT fk_chatbot_message FOREIGN KEY (chatbot_message_id)
+        REFERENCES chatbot_messages(id) ON DELETE SET NULL
+);
+
+-- ✅ Add the foreign key to chatbot_triggers after chatbot_messages is created
 SET @constraint_exists = (
     SELECT COUNT(*)
     FROM information_schema.table_constraints
