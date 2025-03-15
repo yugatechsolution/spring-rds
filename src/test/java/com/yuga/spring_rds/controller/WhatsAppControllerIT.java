@@ -46,7 +46,7 @@ class WhatsAppControllerIT {
   @BeforeEach
   void setUp() {
     // Generate a test user and JWT token
-    jwtToken = "Bearer " + JwtUtil.generateToken(TestUtil.getUser().getId());
+    jwtToken = "Bearer " + JwtUtil.generateToken(TestUtil.getUser().getUsername());
   }
 
   @Test

@@ -54,7 +54,7 @@ class ContactControllerIT {
             .findByUsernameOrEmail(testUser.getUsername(), testUser.getEmail())
             .orElseGet(() -> userRepository.saveAndFlush(testUser));
     contactRepository.findByIdUserId(testUser.getId()).forEach(contactRepository::delete);
-    jwtToken = "Bearer " + JwtUtil.generateToken(testUser.getId());
+    jwtToken = "Bearer " + JwtUtil.generateToken(testUser.getUsername());
   }
 
   @Test

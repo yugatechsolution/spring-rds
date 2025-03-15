@@ -15,16 +15,16 @@ public class JwtUtil {
 
   private static final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-  public static String generateToken(Long id) {
+  public static String generateToken(String username) {
     return Jwts.builder()
-        .setSubject(String.valueOf(id))
+        .setSubject(username)
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
         .signWith(key, SignatureAlgorithm.HS256)
         .compact();
   }
 
-  public static String validateTokenAndRetrieveUserId(String token) {
+  public static String validateTokenAndRetrieveUsername(String token) {
     if (Objects.isNull(token)) throw new JwtException("Bearer Token not present!");
     if (token.startsWith("Bearer ")) token = token.substring(7);
     try {

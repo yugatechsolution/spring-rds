@@ -1,12 +1,12 @@
 package com.yuga.spring_rds.domain.whatsapp.messageRequestType;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImageMessageRequest implements MessageRequest {

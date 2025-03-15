@@ -27,7 +27,7 @@ public class UserService {
             UserDTO.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .token(JwtUtil.generateToken(user.getId()))
+                .token(JwtUtil.generateToken(user.getUsername()))
                 .build());
   }
 
@@ -42,7 +42,7 @@ public class UserService {
                 UserDTO.builder()
                     .username(user.getUsername())
                     .email(user.getEmail())
-                    .token(JwtUtil.generateToken(user.getId()))
+                    .token(JwtUtil.generateToken(user.getUsername()))
                     .build());
       }
     }

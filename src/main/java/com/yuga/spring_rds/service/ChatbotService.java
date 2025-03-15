@@ -1,21 +1,30 @@
 package com.yuga.spring_rds.service;
 
-import com.yuga.spring_rds.advice.RequestContext;
+import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.domain.whatsapp.ChatbotMessage;
 import com.yuga.spring_rds.domain.whatsapp.ChatbotTrigger;
 import com.yuga.spring_rds.domain.whatsapp.NextMessageMapping;
 import com.yuga.spring_rds.domain.whatsapp.messageRequestType.MessageRequest;
+import com.yuga.spring_rds.domain.whatsapp.util.BaseWhatsAppMessageRequest;
 import com.yuga.spring_rds.dto.ChatbotMessageDTO;
 import com.yuga.spring_rds.repository.ChatbotMessageRepository;
 import com.yuga.spring_rds.repository.ChatbotTriggerRepository;
+import com.yuga.spring_rds.repository.NextMessageMappingRepository;
+import jakarta.transaction.Transactional;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.IntStream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class ChatbotService {
 
   @Autowired private ChatbotTriggerRepository chatbotTriggerRepository;
   @Autowired private ChatbotMessageRepository chatbotMessageRepository;
+  @Autowired private NextMessageMappingRepository nextMessageMappingRepository;
 
   public ChatbotMessage getFullFlowForTrigger(String triggerText) {
     ChatbotTrigger trigger =
@@ -41,28 +50,59 @@ public class ChatbotService {
     }
   }
 
-  public ChatbotMessageDTO createChatbotFlow(ChatbotMessageDTO chatbotMessageDTO) {
-    ChatbotMessage chatbotMessage =
-        ChatbotMessage.builder()
-            .user(RequestContext.getUser())
-            .type(chatbotMessageDTO.getType())
-            .request(getMessageRequest(chatbotMessageDTO))
-            .build();
-    chatbotMessageRepository.save(chatbotMessage);
+  @Transactional
+  public ChatbotMessageDTO createChatbotFlow(ChatbotMessageDTO chatbotMessageDTO, User user) {
+    Map<Integer, ChatbotMessage> indexToMessageMapping = new HashMap<>();
+    IntStream.range(0, chatbotMessageDTO.getWhatsAppMessageRequests().size())
+        .forEach(
+            index -> {
+              log.info("Processing and saving chatbot message request for index={}", index);
+              BaseWhatsAppMessageRequest msgReq =
+                  chatbotMessageDTO.getWhatsAppMessageRequests().get(index);
+              ChatbotMessage chatbotMessage =
+                  ChatbotMessage.builder()
+                      .user(user)
+                      .type(msgReq.getType())
+                      .request(msgReq.getInteractive())
+                      .build();
+              chatbotMessageRepository.save(chatbotMessage);
+              indexToMessageMapping.put(index, chatbotMessage);
+            });
+
+    chatbotMessageDTO
+        .getConnections()
+        .forEach(
+            nextMessageMappingDTO -> {
+              log.info(
+                  "Processing and saving NextMessageMapping for request={}", nextMessageMappingDTO);
+              NextMessageMapping nextMessageMapping =
+                  NextMessageMapping.builder()
+                      .parentMessage(
+                          indexToMessageMapping.get(nextMessageMappingDTO.getParentMessageIndex()))
+                      .nextMessage(
+                          indexToMessageMapping.get(nextMessageMappingDTO.getNextMessageIndex()))
+                      .actionTrigger(nextMessageMappingDTO.getActionTrigger())
+                      .build();
+              nextMessageMappingRepository.save(nextMessageMapping);
+            });
+
+    log.info(
+        "Processing and saving Chatbot trigger for triggerText={}",
+        chatbotMessageDTO.getTriggerText());
     ChatbotTrigger chatbotTrigger =
         ChatbotTrigger.builder()
-            .chatbotMessage(chatbotMessage)
+            .chatbotMessage(indexToMessageMapping.get(0))
             .triggerText(chatbotMessageDTO.getTriggerText())
             .build();
     chatbotTriggerRepository.save(chatbotTrigger);
-    chatbotMessageDTO.setId(chatbotMessage.getId());
     return chatbotMessageDTO;
   }
 
-  private MessageRequest getMessageRequest(ChatbotMessageDTO chatbotMessageDTO) {
-    return switch (chatbotMessageDTO.getType()) {
-      case text -> chatbotMessageDTO.getText();
-      case video -> chatbotMessageDTO.getVideo();
+  private MessageRequest getMessageRequest(BaseWhatsAppMessageRequest baseWhatsAppMessageRequest) {
+    return switch (baseWhatsAppMessageRequest.getType()) {
+      case text -> baseWhatsAppMessageRequest.getText();
+      case interactive -> baseWhatsAppMessageRequest.getInteractive();
+      case video -> baseWhatsAppMessageRequest.getVideo();
       default -> null;
     };
   }

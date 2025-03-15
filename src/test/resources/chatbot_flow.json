@@ -1,0 +1,133 @@
+{
+  "triggerText": "Hello, this is a chatbot interactive list message",
+  "whatsAppMessageRequests": [
+    {
+      "type": "interactive",
+      "interactive": {
+        "type": "LIST",
+        "header": {
+          "type": "text",
+          "text": "LIST HEADER!"
+        },
+        "body": {
+          "text": "This is the body of the interactive list message"
+        },
+        "footer": {
+          "text": "This is the footer of the message"
+        },
+        "action": {
+          "button": "Choose an option",
+          "sections": [
+            {
+              "title": "Section 1",
+              "rows": [
+                {
+                  "id": "SECTION_1_ROW_1_ID",
+                  "title": "Option 1",
+                  "description": "Description for Option 1"
+                },
+                {
+                  "id": "SECTION_1_ROW_2_ID",
+                  "title": "Option 2",
+                  "description": "Description for Option 2"
+                }
+              ]
+            },
+            {
+              "title": "Section 2",
+              "rows": [
+                {
+                  "id": "SECTION_2_ROW_1_ID",
+                  "title": "Option 3",
+                  "description": "Description for Option 3"
+                },
+                {
+                  "id": "SECTION_2_ROW_2_ID",
+                  "title": "Option 4",
+                  "description": "Description for Option 4"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "interactive",
+      "interactive": {
+        "type": "LIST",
+        "header": {
+          "type": "text",
+          "text": "Second List Header"
+        },
+        "body": {
+          "text": "This is the second interactive list body"
+        },
+        "footer": {
+          "text": "This is the second list footer"
+        },
+        "action": {
+          "button": "Choose another option",
+          "sections": [
+            {
+              "title": "Another Section",
+              "rows": [
+                {
+                  "id": "ANOTHER_SECTION_ROW_1_ID",
+                  "title": "Another Option 1",
+                  "description": "Another description 1"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "text",
+      "text": {
+        "body": "Thank you for selecting Option 1"
+      }
+    },
+    {
+      "type": "text",
+      "text": {
+        "body": "Thank you for selecting Option 2"
+      }
+    },
+    {
+      "type": "text",
+      "text": {
+        "body": "Thank you for selecting Option 3"
+      }
+    },
+    {
+      "type": "text",
+      "text": {
+        "body": "Thank you for selecting Option 4"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "parentMessageIndex": 0,
+      "childMessageIndex": 1,
+      "actionTrigger": "SECTION_1_ROW_2_ID"
+    },
+    {
+      "parentMessageIndex": 0,
+      "childMessageIndex": 2,
+      "actionTrigger": "SECTION_1_ROW_1_ID"
+    },
+    {
+      "parentMessageIndex": 0,
+      "childMessageIndex": 3,
+      "actionTrigger": "SECTION_2_ROW_1_ID"
+    },
+    {
+      "parentMessageIndex": 0,
+      "childMessageIndex": 4,
+      "actionTrigger": "SECTION_2_ROW_2_ID"
+    }
+  ]
+}
