@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatbotMessageDTO {
+public class ChatbotFlowDTO {
   private String triggerText;
   List<BaseWhatsAppMessageRequest> whatsAppMessageRequests;
   List<NextMessageMappingDTO> connections;

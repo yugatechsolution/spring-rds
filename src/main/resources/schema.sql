@@ -6,9 +6,6 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 --SET FOREIGN_KEY_CHECKS = 0;
---DROP TABLE IF EXISTS contacts;
---DROP TABLE IF EXISTS whatsapp_contacts;
---DROP TABLE IF EXISTS chat_messages;
 --DROP TABLE IF EXISTS chatbot_messages;
 --DROP TABLE IF EXISTS next_message_mapping;
 --DROP TABLE IF EXISTS chatbot_triggers;
@@ -45,20 +42,31 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     status_timestamp BIGINT, -- Timestamp for status update
     FOREIGN KEY (phone_number_id, wa_id) REFERENCES whatsapp_contacts(phone_number_id, wa_id) ON DELETE CASCADE
 );
-
+--
 --DROP INDEX IF EXISTS idx_chat_wa_id ON chat_messages;
 --CREATE INDEX idx_chat_wa_id ON chat_messages(wa_id);
 --DROP INDEX IF EXISTS idx_chat_wa_id;
 --CREATE INDEX idx_chat_wa_id ON chat_messages(wa_id);
 
+-- Create chatbot_triggers without foreign key initially
+CREATE TABLE IF NOT EXISTS chatbot_triggers (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    trigger_text VARCHAR(255) NOT NULL UNIQUE,
+    chatbot_message_id BIGINT
+);
+
+-- Create chatbot_messages
 CREATE TABLE IF NOT EXISTS chatbot_messages (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     type VARCHAR(50) NOT NULL,
     request JSON NOT NULL,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
+    trigger_id BIGINT,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT fk_trigger FOREIGN KEY (trigger_id) REFERENCES chatbot_triggers(id) ON DELETE CASCADE
 );
 
+-- Create next_message_mapping
 CREATE TABLE IF NOT EXISTS next_message_mapping (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     parent_message_id BIGINT NOT NULL,
@@ -70,10 +78,7 @@ CREATE TABLE IF NOT EXISTS next_message_mapping (
         REFERENCES chatbot_messages(id) ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS chatbot_triggers (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    trigger_text VARCHAR(255) NOT NULL UNIQUE,
-    chatbot_message_id BIGINT NOT NULL,
-    CONSTRAINT fk_chatbot_message FOREIGN KEY (chatbot_message_id)
-        REFERENCES chatbot_messages(id) ON DELETE CASCADE
-);
+-- Add the foreign key to chatbot_triggers after chatbot_messages is created
+ALTER TABLE chatbot_triggers
+ADD CONSTRAINT fk_chatbot_message FOREIGN KEY (chatbot_message_id)
+REFERENCES chatbot_messages(id) ON DELETE CASCADE;

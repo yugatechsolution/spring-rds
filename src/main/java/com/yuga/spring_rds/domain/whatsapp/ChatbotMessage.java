@@ -2,7 +2,6 @@ package com.yuga.spring_rds.domain.whatsapp;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yuga.spring_rds.domain.User;
-import com.yuga.spring_rds.domain.whatsapp.messageRequestType.*;
 import com.yuga.spring_rds.util.MessageRequestConverter;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -49,9 +48,7 @@ public class ChatbotMessage {
   @OneToMany(mappedBy = "parentMessage", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<NextMessageMapping> nextMessages = new ArrayList<>();
 
-  // Helper method to pass type to converter
-  @Transient
-  public WhatsAppMessageType getTypeForConverter() {
-    return this.type;
-  }
+  @ManyToOne
+  @JoinColumn(name = "trigger_id")
+  private ChatbotTrigger trigger;
 }

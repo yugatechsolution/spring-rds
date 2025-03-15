@@ -1,6 +1,7 @@
 package com.yuga.spring_rds.advice;
 
 import io.jsonwebtoken.JwtException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,11 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleJwtException(JwtException ex) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
         .body("Invalid or expired JWT token: " + ex.getMessage());
+  }
+
+  @ExceptionHandler(EntityNotFoundException.class)
+  public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
   }
 
   @ExceptionHandler(Exception.class)

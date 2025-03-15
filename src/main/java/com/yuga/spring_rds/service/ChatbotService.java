@@ -4,17 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.connector.WhatsAppConnector;
 import com.yuga.spring_rds.domain.User;
-import com.yuga.spring_rds.domain.whatsapp.ChatbotMessage;
-import com.yuga.spring_rds.domain.whatsapp.ChatbotTrigger;
-import com.yuga.spring_rds.domain.whatsapp.NextMessageMapping;
+import com.yuga.spring_rds.domain.whatsapp.*;
+import com.yuga.spring_rds.domain.whatsapp.messageRequestType.*;
 import com.yuga.spring_rds.domain.whatsapp.util.BaseWhatsAppMessageRequest;
-import com.yuga.spring_rds.dto.ChatbotMessageDTO;
-import com.yuga.spring_rds.repository.ChatbotMessageRepository;
-import com.yuga.spring_rds.repository.ChatbotTriggerRepository;
-import com.yuga.spring_rds.repository.NextMessageMappingRepository;
+import com.yuga.spring_rds.dto.ChatbotFlowDTO;
+import com.yuga.spring_rds.dto.NextMessageMappingDTO;
+import com.yuga.spring_rds.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,45 +22,96 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChatbotService {
 
-  public ObjectMapper mapper = WhatsAppConnector.mapper;
+  private final ObjectMapper mapper = WhatsAppConnector.mapper;
 
   @Autowired private ChatbotTriggerRepository chatbotTriggerRepository;
   @Autowired private ChatbotMessageRepository chatbotMessageRepository;
   @Autowired private NextMessageMappingRepository nextMessageMappingRepository;
 
-  public ChatbotMessage getFullFlowForTrigger(String triggerText) {
+  public ChatbotFlowDTO getFullFlow(String triggerText) {
     ChatbotTrigger trigger =
         chatbotTriggerRepository
             .findByTriggerText(triggerText)
-            .orElseThrow(() -> new IllegalArgumentException("Trigger not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid triggerText"));
 
-    // Load entire message tree using @EntityGraph
-    return chatbotMessageRepository
-        .findById(trigger.getChatbotMessage().getId())
-        .orElseThrow(() -> new IllegalArgumentException("Message not found"));
+    ChatbotMessage startingMessage = trigger.getStartingMessage();
+    log.info("Starting message for trigger '{}' -> ID: {}", triggerText, startingMessage.getId());
+
+    List<BaseWhatsAppMessageRequest> messageRequests = new ArrayList<>();
+    List<NextMessageMappingDTO> connections = new ArrayList<>();
+    Map<Long, Integer> messageIndexMap = new HashMap<>();
+
+    // Flatten the message tree
+    flattenFlow(startingMessage, messageRequests, connections, messageIndexMap);
+
+    return new ChatbotFlowDTO(triggerText, messageRequests, connections);
   }
 
-  public void printMessageFlow(ChatbotMessage message, int level) {
-    String indent = "  ".repeat(level);
-    System.out.println(indent + "Message ID: " + message.getId());
-    System.out.println(indent + "Message Type: " + message.getType());
-    System.out.println(indent + "Message Body: " + message.getRequest());
+  private void flattenFlow(
+      ChatbotMessage chatbotMessage,
+      List<BaseWhatsAppMessageRequest> messageRequests,
+      List<NextMessageMappingDTO> connections,
+      Map<Long, Integer> messageIndexMap) {
 
-    for (NextMessageMapping next : message.getNextMessages()) {
-      System.out.println(indent + "↳ Trigger: " + next.getActionTrigger());
-      printMessageFlow(next.getNextMessage(), level + 1);
+    if (messageIndexMap.containsKey(chatbotMessage.getId())) {
+      return;
+    }
+
+    int currentIndex = messageRequests.size();
+    messageIndexMap.put(chatbotMessage.getId(), currentIndex);
+
+    messageRequests.add(convertToBaseWhatsAppMessageRequest(chatbotMessage));
+
+    for (NextMessageMapping mapping : chatbotMessage.getNextMessages()) {
+      ChatbotMessage nextMessage = mapping.getNextMessage();
+      flattenFlow(nextMessage, messageRequests, connections, messageIndexMap);
+      int nextIndex = messageIndexMap.get(nextMessage.getId());
+      connections.add(
+          new NextMessageMappingDTO(currentIndex, nextIndex, mapping.getActionTrigger()));
     }
   }
 
+  private BaseWhatsAppMessageRequest convertToBaseWhatsAppMessageRequest(ChatbotMessage message) {
+    log.info("Converting message ID={} to BaseWhatsAppMessageRequest", message.getId());
+    BaseWhatsAppMessageRequest.BaseWhatsAppMessageRequestBuilder builder =
+        BaseWhatsAppMessageRequest.builder();
+    return switch (message.getType()) {
+      case document -> null;
+      case image -> null;
+      case text ->
+          builder
+              .type(WhatsAppMessageType.text)
+              .text(mapper.convertValue(message.getRequest(), TextMessageRequest.class))
+              .build();
+      case interactive ->
+          builder
+              .type(WhatsAppMessageType.interactive)
+              .interactive(
+                  mapper.convertValue(message.getRequest(), InteractiveMessageRequest.class))
+              .build();
+      case video -> null;
+      case audio -> null;
+    };
+  }
+
+  /** Create a new chatbot flow. */
   @Transactional
-  public ChatbotMessageDTO createChatbotFlow(ChatbotMessageDTO chatbotMessageDTO, User user) {
+  public ChatbotFlowDTO createChatbotFlow(ChatbotFlowDTO chatbotFlowDTO, User user) {
+    log.info("Creating chatbot flow for triggerText={}", chatbotFlowDTO.getTriggerText());
+
+    chatbotTriggerRepository
+        .findByTriggerText(chatbotFlowDTO.getTriggerText())
+        .ifPresent(
+            chatbotTrigger -> {
+              throw new RuntimeException("Chatbot Flow already exists");
+            });
     Map<Integer, ChatbotMessage> indexToMessageMapping = new HashMap<>();
-    IntStream.range(0, chatbotMessageDTO.getWhatsAppMessageRequests().size())
+
+    IntStream.range(0, chatbotFlowDTO.getWhatsAppMessageRequests().size())
         .forEach(
             index -> {
-              log.info("Processing and saving chatbot message request for index={}", index);
               BaseWhatsAppMessageRequest msgReq =
-                  chatbotMessageDTO.getWhatsAppMessageRequests().get(index);
+                  chatbotFlowDTO.getWhatsAppMessageRequests().get(index);
               ChatbotMessage chatbotMessage =
                   ChatbotMessage.builder()
                       .user(user)
@@ -73,12 +122,26 @@ public class ChatbotService {
               indexToMessageMapping.put(index, chatbotMessage);
             });
 
-    chatbotMessageDTO
+    ChatbotTrigger chatbotTrigger =
+        ChatbotTrigger.builder()
+            .startingMessage(indexToMessageMapping.get(0))
+            .triggerText(chatbotFlowDTO.getTriggerText())
+            .build();
+    chatbotTriggerRepository.save(chatbotTrigger);
+
+    // Link the trigger to all messages
+    indexToMessageMapping
+        .values()
+        .forEach(
+            message -> {
+              message.setTrigger(chatbotTrigger);
+              chatbotMessageRepository.save(message);
+            });
+
+    chatbotFlowDTO
         .getConnections()
         .forEach(
             nextMessageMappingDTO -> {
-              log.info(
-                  "Processing and saving NextMessageMapping for request={}", nextMessageMappingDTO);
               NextMessageMapping nextMessageMapping =
                   NextMessageMapping.builder()
                       .parentMessage(
@@ -91,24 +154,33 @@ public class ChatbotService {
             });
 
     log.info(
-        "Processing and saving Chatbot trigger for triggerText={}",
-        chatbotMessageDTO.getTriggerText());
-    ChatbotTrigger chatbotTrigger =
-        ChatbotTrigger.builder()
-            .chatbotMessage(indexToMessageMapping.get(0))
-            .triggerText(chatbotMessageDTO.getTriggerText())
-            .build();
-    chatbotTriggerRepository.save(chatbotTrigger);
-    return chatbotMessageDTO;
+        "Successfully created chatbot flow for triggerText={}", chatbotFlowDTO.getTriggerText());
+    return chatbotFlowDTO;
   }
 
-  private JsonNode getMessageRequest(BaseWhatsAppMessageRequest baseWhatsAppMessageRequest) {
-    return switch (baseWhatsAppMessageRequest.getType()) {
-      case text -> mapper.convertValue(baseWhatsAppMessageRequest.getText(), JsonNode.class);
-      case interactive ->
-          mapper.convertValue(baseWhatsAppMessageRequest.getInteractive(), JsonNode.class);
-      case video -> mapper.convertValue(baseWhatsAppMessageRequest.getVideo(), JsonNode.class);
+  private JsonNode getMessageRequest(BaseWhatsAppMessageRequest request) {
+    return switch (request.getType()) {
+      case text -> mapper.convertValue(request.getText(), JsonNode.class);
+      case interactive -> mapper.convertValue(request.getInteractive(), JsonNode.class);
+      case video -> mapper.convertValue(request.getVideo(), JsonNode.class);
       default -> null;
     };
+  }
+
+  @Transactional
+  public void deleteFullChatbotFlow(String triggerText) {
+    log.info("Starting deletion for chatbot flow with triggerText={}", triggerText);
+
+    ChatbotTrigger trigger =
+        chatbotTriggerRepository
+            .findByTriggerText(triggerText)
+            .orElseThrow(
+                () ->
+                    new EntityNotFoundException(
+                        "ChatbotTrigger not found for triggerText: " + triggerText));
+
+    chatbotTriggerRepository.delete(trigger); // Cascade should handle the rest
+
+    log.info("Deleted ChatbotTrigger with ID={}", trigger.getId());
   }
 }

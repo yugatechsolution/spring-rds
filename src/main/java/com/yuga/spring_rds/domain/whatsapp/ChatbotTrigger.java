@@ -1,6 +1,8 @@
 package com.yuga.spring_rds.domain.whatsapp;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +23,10 @@ public class ChatbotTrigger {
   @Column(unique = true, nullable = false)
   private String triggerText;
 
-  @ManyToOne
-  @JoinColumn(name = "chatbot_message_id", nullable = false)
-  private ChatbotMessage chatbotMessage;
+  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "chatbot_message_id")
+  private ChatbotMessage startingMessage;
+
+  @OneToMany(mappedBy = "trigger", cascade = CascadeType.ALL)
+  private List<ChatbotMessage> messages = new ArrayList<>();
 }

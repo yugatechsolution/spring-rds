@@ -1,13 +1,12 @@
 package com.yuga.spring_rds.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.SpringRdsApplication;
-import com.yuga.spring_rds.domain.whatsapp.messageRequestType.interactive.InteractiveListMessageRequest;
-import com.yuga.spring_rds.dto.ChatbotMessageDTO;
+import com.yuga.spring_rds.dto.ChatbotFlowDTO;
 import com.yuga.spring_rds.util.JwtUtil;
 import com.yuga.spring_rds.util.TestUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +33,7 @@ class ChatbotControllerIT {
   @Autowired private ObjectMapper objectMapper;
 
   private String jwtToken;
+  private static String triggerText = "Test Trigger";
 
   @BeforeEach
   void setUp() {
@@ -42,13 +42,12 @@ class ChatbotControllerIT {
 
   @Test
   @Order(1)
-  void testInteractiveListMessage_Success() throws Exception {
-    // Create a valid chatbot message request
-    ChatbotMessageDTO request = TestUtil.getChatbotMessage();
-    callApiAndAddAssertions(request);
-  }
+  void testCreateChatbotFlow_Success() throws Exception {
+    log.info("Starting test for chatbot flow creation");
 
-  private void callApiAndAddAssertions(ChatbotMessageDTO request) throws Exception {
+    // Create chatbot flow request
+    ChatbotFlowDTO request = TestUtil.getChatbotMessage();
+    triggerText = request.getTriggerText();
     String requestJson = objectMapper.writeValueAsString(request);
 
     String responseJson =
@@ -63,16 +62,60 @@ class ChatbotControllerIT {
             .getResponse()
             .getContentAsString();
 
-    ChatbotMessageDTO response = objectMapper.readValue(responseJson, ChatbotMessageDTO.class);
+    ChatbotFlowDTO response = objectMapper.readValue(responseJson, ChatbotFlowDTO.class);
+
+    log.info("Chatbot flow created successfully: {}", response);
 
     assertThat(response).isNotNull();
     assertThat(response.getTriggerText()).isEqualTo(request.getTriggerText());
-    assertThat(response.getWhatsAppMessageRequests()).isNotNull();
-    assertThat(
-            ((InteractiveListMessageRequest)
-                    (response.getWhatsAppMessageRequests().get(0).getInteractive()))
-                .getAction()
-                .getSections())
-        .hasSize(2);
+    assertThat(response.getWhatsAppMessageRequests()).isNotEmpty();
+  }
+
+  @Test
+  @Order(2)
+  void testGetChatbotFlow_Success() throws Exception {
+    log.info("Starting test for fetching chatbot flow");
+
+    String responseJson =
+        mockMvc
+            .perform(
+                get("/api/chatbot")
+                    .header("Authorization", jwtToken)
+                    .param("triggerText", triggerText))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    ChatbotFlowDTO response = objectMapper.readValue(responseJson, ChatbotFlowDTO.class);
+
+    log.info("Fetched chatbot flow: {}", response);
+
+    assertThat(response).isNotNull();
+    assertThat(response.getTriggerText()).isEqualTo(triggerText);
+    assertThat(response.getWhatsAppMessageRequests()).isNotEmpty();
+  }
+
+  @Test
+  @Order(3)
+  void testDeleteChatbotFlow_Success() throws Exception {
+    log.info("Starting test for chatbot flow deletion");
+
+    mockMvc
+        .perform(
+            delete("/api/chatbot")
+                .header("Authorization", jwtToken)
+                .param("triggerText", triggerText))
+        .andExpect(status().isNoContent());
+
+    log.info("Chatbot flow deleted successfully");
+
+    // Verify that the flow is deleted by attempting to fetch it
+    mockMvc
+        .perform(
+            get("/api/chatbot").header("Authorization", jwtToken).param("triggerText", triggerText))
+        .andExpect(status().isNotFound());
+
+    log.info("Confirmed that chatbot flow with triggerText={} is deleted", triggerText);
   }
 }

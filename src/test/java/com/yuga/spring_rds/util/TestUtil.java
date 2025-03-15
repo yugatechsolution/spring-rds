@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.domain.Contact;
 import com.yuga.spring_rds.domain.ContactId;
 import com.yuga.spring_rds.domain.User;
-import com.yuga.spring_rds.dto.ChatbotMessageDTO;
+import com.yuga.spring_rds.dto.ChatbotFlowDTO;
 import com.yuga.spring_rds.dto.ContactDTO;
 import java.io.File;
 import java.io.IOException;
@@ -36,13 +36,13 @@ public class TestUtil {
     return ContactDTO.builder().phoneNumber(PHONE_NUMBER).name("John Doe").build();
   }
 
-  public static ChatbotMessageDTO getChatbotMessage() {
+  public static ChatbotFlowDTO getChatbotMessage() {
     try {
       File file = new File("D:\\Development\\spring-rds\\src\\test\\resources\\chatbot_flow.json");
       if (!file.exists()) {
         throw new IOException("File not found");
       }
-      return objectMapper.readValue(file, ChatbotMessageDTO.class);
+      return objectMapper.readValue(file, ChatbotFlowDTO.class);
     } catch (Exception e) {
       log.error("Error parsing chatbot message JSON from file: {}", e.getMessage(), e);
       throw new RuntimeException("Failed to parse chatbot message from file", e);
