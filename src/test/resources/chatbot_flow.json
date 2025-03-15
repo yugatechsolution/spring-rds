@@ -4,7 +4,7 @@
     {
       "type": "interactive",
       "interactive": {
-        "type": "LIST",
+        "type": "list",
         "header": {
           "type": "text",
           "text": "LIST HEADER!"
@@ -55,7 +55,7 @@
     {
       "type": "interactive",
       "interactive": {
-        "type": "LIST",
+        "type": "list",
         "header": {
           "type": "text",
           "text": "Second List Header"

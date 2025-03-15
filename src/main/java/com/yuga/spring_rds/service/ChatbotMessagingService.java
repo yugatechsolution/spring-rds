@@ -29,7 +29,7 @@ public class ChatbotMessagingService {
             .to(recipientPhoneNumber)
             .type(chatbotMessage.getType())
             .build();
-    whatsAppMessageRequestModel.enrich(chatbotMessage, mapper);
+    whatsAppMessageRequestModel.enrich(chatbotMessage.getRequest(), mapper);
     log.info("Sending whatsapp message based on trigger text: {}", whatsAppMessageRequestModel);
     var response = whatsAppConnector.sendWhatsAppMessage(whatsAppMessageRequestModel);
     chatService.saveOutgoingMessage(whatsAppMessageRequestModel, response);

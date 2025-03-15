@@ -1,6 +1,7 @@
 package com.yuga.spring_rds.domain.whatsapp;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class NextMessageMapping {
 
   @Id
@@ -21,7 +23,6 @@ public class NextMessageMapping {
 
   @ManyToOne
   @JoinColumn(name = "parent_message_id", nullable = false)
-  @JsonBackReference
   private ChatbotMessage parentMessage;
 
   @ManyToOne

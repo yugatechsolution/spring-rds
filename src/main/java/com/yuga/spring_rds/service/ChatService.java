@@ -141,8 +141,8 @@ public class ChatService {
         }
         InteractiveMessageType interactiveMessageType = requestModel.getInteractive().getType();
         switch (interactiveMessageType) {
-          case LIST -> builder.messageType(ChatMessage.MessageType.LIST);
-          case BUTTON -> builder.messageType(ChatMessage.MessageType.BUTTON);
+          case list -> builder.messageType(ChatMessage.MessageType.LIST);
+          case button -> builder.messageType(ChatMessage.MessageType.BUTTON);
         }
       }
       default -> {

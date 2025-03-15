@@ -1,6 +1,6 @@
 package com.yuga.spring_rds.domain.whatsapp;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.util.MessageRequestConverter;
@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
           name = "nextMessagesSubgraph",
           attributeNodes = {@NamedAttributeNode("nextMessage")})
     })
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class ChatbotMessage {
 
   @Id
@@ -47,7 +48,6 @@ public class ChatbotMessage {
   private JsonNode request;
 
   @OneToMany(mappedBy = "parentMessage", cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonManagedReference
   private List<NextMessageMapping> nextMessages = new ArrayList<>();
 
   @ManyToOne

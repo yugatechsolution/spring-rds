@@ -21,9 +21,9 @@ import lombok.experimental.SuperBuilder;
     property = "type",
     visible = true)
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = InteractiveReplyButtonsMessageRequest.class, name = "BUTTON"),
-  @JsonSubTypes.Type(value = InteractiveListMessageRequest.class, name = "LIST"),
-  @JsonSubTypes.Type(value = InteractiveCtaUrlMessageRequest.class, name = "CTA_URL")
+  @JsonSubTypes.Type(value = InteractiveReplyButtonsMessageRequest.class, name = "button"),
+  @JsonSubTypes.Type(value = InteractiveListMessageRequest.class, name = "list"),
+  @JsonSubTypes.Type(value = InteractiveCtaUrlMessageRequest.class, name = "cta_url")
 })
 public class InteractiveMessageRequest {
   InteractiveMessageType type;

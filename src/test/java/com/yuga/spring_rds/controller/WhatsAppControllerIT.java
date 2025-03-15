@@ -78,7 +78,7 @@ class WhatsAppControllerIT {
             .type(WhatsAppMessageType.interactive)
             .interactive(
                 InteractiveListMessageRequest.builder()
-                    .type(InteractiveMessageType.LIST)
+                    .type(InteractiveMessageType.list)
                     .header(
                         InteractiveListMessageRequest.Header.builder()
                             .type("text")

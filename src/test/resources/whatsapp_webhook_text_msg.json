@@ -1,0 +1,39 @@
+{
+    "object": "whatsapp_business_account",
+    "entry": [
+        {
+            "id": "1185398882883314",
+            "changes": [
+                {
+                    "value": {
+                        "messaging_product": "whatsapp",
+                        "metadata": {
+                            "display_phone_number": "919588443745",
+                            "phone_number_id": "575172355683018"
+                        },
+                        "contacts": [
+                            {
+                                "profile": {
+                                    "name": "Raghav Loya"
+                                },
+                                "wa_id": "916301472014"
+                            }
+                        ],
+                        "messages": [
+                            {
+                                "from": "916301472014",
+                                "id": "wamid.HBgMOTE2MzAxNDcyMDfwaedcasdcsdvEyNzZBRjhFOTAxRTU0NTFDODlCQTA4MTQyQjcA",
+                                "timestamp": "1742046172",
+                                "text": {
+                                    "body": "Hi"
+                                },
+                                "type": "text"
+                            }
+                        ]
+                    },
+                    "field": "messages"
+                }
+            ]
+        }
+    ]
+}

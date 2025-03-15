@@ -1,5 +1,8 @@
 package com.yuga.spring_rds.domain.whatsapp;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class ChatbotTrigger {
 
   @Id
@@ -28,5 +32,6 @@ public class ChatbotTrigger {
   private ChatbotMessage startingMessage;
 
   @OneToMany(mappedBy = "trigger", cascade = CascadeType.ALL)
+  @JsonIgnore
   private List<ChatbotMessage> messages = new ArrayList<>();
 }
