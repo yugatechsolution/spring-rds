@@ -1,6 +1,7 @@
 package com.yuga.spring_rds.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -29,10 +30,12 @@ public class ChatMessageMapping {
 
   @OneToOne
   @JoinColumn(name = "chat_message_id", referencedColumnName = "messageId")
+  @JsonIgnore
   private ChatMessage chatMessage;
 
   @ManyToOne
   @JoinColumn(name = "chatbot_message_id", referencedColumnName = "id")
+  @JsonIgnore
   private ChatbotMessage chatbotMessage;
 
   @CreationTimestamp private LocalDateTime createdAt;
