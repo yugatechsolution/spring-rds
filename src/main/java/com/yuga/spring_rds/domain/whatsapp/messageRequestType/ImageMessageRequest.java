@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImageMessageRequest implements MessageRequest {
+public class ImageMessageRequest {
   String id;
   String link;
   String caption;

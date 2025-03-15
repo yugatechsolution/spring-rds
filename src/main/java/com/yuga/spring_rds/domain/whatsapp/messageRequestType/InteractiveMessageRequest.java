@@ -25,6 +25,6 @@ import lombok.experimental.SuperBuilder;
   @JsonSubTypes.Type(value = InteractiveListMessageRequest.class, name = "LIST"),
   @JsonSubTypes.Type(value = InteractiveCtaUrlMessageRequest.class, name = "CTA_URL")
 })
-public class InteractiveMessageRequest implements MessageRequest {
+public class InteractiveMessageRequest {
   InteractiveMessageType type;
 }

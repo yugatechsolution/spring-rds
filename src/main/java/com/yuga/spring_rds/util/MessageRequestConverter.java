@@ -1,19 +1,19 @@
 package com.yuga.spring_rds.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.connector.WhatsAppConnector;
-import com.yuga.spring_rds.domain.whatsapp.messageRequestType.MessageRequest;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class MessageRequestConverter implements AttributeConverter<MessageRequest, String> {
+public class MessageRequestConverter implements AttributeConverter<JsonNode, String> {
 
   private final ObjectMapper objectMapper = WhatsAppConnector.mapper;
 
   @Override
-  public String convertToDatabaseColumn(MessageRequest attribute) {
+  public String convertToDatabaseColumn(JsonNode attribute) {
     try {
       return objectMapper.writeValueAsString(attribute);
     } catch (JsonProcessingException e) {
@@ -22,13 +22,13 @@ public class MessageRequestConverter implements AttributeConverter<MessageReques
   }
 
   @Override
-  public MessageRequest convertToEntityAttribute(String dbData) {
+  public JsonNode convertToEntityAttribute(String dbData) {
     try {
       if (dbData == null) return null;
       // Use Jackson to figure out the type based on `type` field
-      return objectMapper.readValue(dbData, MessageRequest.class);
+      return objectMapper.readValue(dbData, JsonNode.class);
     } catch (Exception e) {
-      throw new RuntimeException("Failed to convert JSON to MessageRequest", e);
+      throw new RuntimeException("Failed to convert JSON to JsonNode", e);
     }
   }
 }

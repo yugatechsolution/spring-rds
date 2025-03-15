@@ -1,7 +1,6 @@
 package com.yuga.spring_rds.domain.whatsapp;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.domain.whatsapp.messageRequestType.*;
 import com.yuga.spring_rds.util.MessageRequestConverter;
@@ -43,21 +42,16 @@ public class ChatbotMessage {
   @Column(nullable = false)
   private WhatsAppMessageType type;
 
-  @JsonTypeInfo(
-      use = JsonTypeInfo.Id.NAME,
-      include = JsonTypeInfo.As.EXISTING_PROPERTY,
-      property = "type",
-      visible = true)
-  @JsonSubTypes({
-    @JsonSubTypes.Type(value = TextMessageRequest.class, name = "TEXT"),
-    @JsonSubTypes.Type(value = InteractiveMessageRequest.class, name = "INTERACTIVE"),
-    @JsonSubTypes.Type(value = ImageMessageRequest.class, name = "IMAGE"),
-    @JsonSubTypes.Type(value = DocumentMessageRequest.class, name = "DOCUMENT"),
-    @JsonSubTypes.Type(value = VideoMessageRequest.class, name = "VIDEO")
-  })
   @Convert(converter = MessageRequestConverter.class)
-  private MessageRequest request;
+  @Column(columnDefinition = "JSON")
+  private JsonNode request;
 
   @OneToMany(mappedBy = "parentMessage", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<NextMessageMapping> nextMessages = new ArrayList<>();
+
+  // Helper method to pass type to converter
+  @Transient
+  public WhatsAppMessageType getTypeForConverter() {
+    return this.type;
+  }
 }

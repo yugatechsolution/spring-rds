@@ -1,10 +1,12 @@
 package com.yuga.spring_rds.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yuga.spring_rds.connector.WhatsAppConnector;
 import com.yuga.spring_rds.domain.User;
 import com.yuga.spring_rds.domain.whatsapp.ChatbotMessage;
 import com.yuga.spring_rds.domain.whatsapp.ChatbotTrigger;
 import com.yuga.spring_rds.domain.whatsapp.NextMessageMapping;
-import com.yuga.spring_rds.domain.whatsapp.messageRequestType.MessageRequest;
 import com.yuga.spring_rds.domain.whatsapp.util.BaseWhatsAppMessageRequest;
 import com.yuga.spring_rds.dto.ChatbotMessageDTO;
 import com.yuga.spring_rds.repository.ChatbotMessageRepository;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ChatbotService {
+
+  public ObjectMapper mapper = WhatsAppConnector.mapper;
 
   @Autowired private ChatbotTriggerRepository chatbotTriggerRepository;
   @Autowired private ChatbotMessageRepository chatbotMessageRepository;
@@ -63,7 +67,7 @@ public class ChatbotService {
                   ChatbotMessage.builder()
                       .user(user)
                       .type(msgReq.getType())
-                      .request(msgReq.getInteractive())
+                      .request(getMessageRequest(msgReq))
                       .build();
               chatbotMessageRepository.save(chatbotMessage);
               indexToMessageMapping.put(index, chatbotMessage);
@@ -98,11 +102,12 @@ public class ChatbotService {
     return chatbotMessageDTO;
   }
 
-  private MessageRequest getMessageRequest(BaseWhatsAppMessageRequest baseWhatsAppMessageRequest) {
+  private JsonNode getMessageRequest(BaseWhatsAppMessageRequest baseWhatsAppMessageRequest) {
     return switch (baseWhatsAppMessageRequest.getType()) {
-      case text -> baseWhatsAppMessageRequest.getText();
-      case interactive -> baseWhatsAppMessageRequest.getInteractive();
-      case video -> baseWhatsAppMessageRequest.getVideo();
+      case text -> mapper.convertValue(baseWhatsAppMessageRequest.getText(), JsonNode.class);
+      case interactive ->
+          mapper.convertValue(baseWhatsAppMessageRequest.getInteractive(), JsonNode.class);
+      case video -> mapper.convertValue(baseWhatsAppMessageRequest.getVideo(), JsonNode.class);
       default -> null;
     };
   }
