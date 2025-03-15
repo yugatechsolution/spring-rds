@@ -5,14 +5,14 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(64) NOT NULL
 );
 
-SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS contacts;
-DROP TABLE IF EXISTS whatsapp_contacts;
-DROP TABLE IF EXISTS chat_messages;
-DROP TABLE IF EXISTS chatbot_messages;
-DROP TABLE IF EXISTS next_message_mapping;
-DROP TABLE IF EXISTS chatbot_triggers;
-SET FOREIGN_KEY_CHECKS = 1;
+--SET FOREIGN_KEY_CHECKS = 0;
+--DROP TABLE IF EXISTS contacts;
+--DROP TABLE IF EXISTS whatsapp_contacts;
+--DROP TABLE IF EXISTS chat_messages;
+--DROP TABLE IF EXISTS chatbot_messages;
+--DROP TABLE IF EXISTS next_message_mapping;
+--DROP TABLE IF EXISTS chatbot_triggers;
+--SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE IF NOT EXISTS contacts (
     user_id BIGINT NOT NULL,

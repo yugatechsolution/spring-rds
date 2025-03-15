@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuga.spring_rds.connector.WhatsAppConnector;
 import com.yuga.spring_rds.domain.ChatMessage;
 import com.yuga.spring_rds.domain.WhatsAppContactId;
+import com.yuga.spring_rds.domain.whatsapp.messageRequestType.interactive.InteractiveMessageType;
 import com.yuga.spring_rds.model.api.request.WhatsAppMessageRequest;
 import com.yuga.spring_rds.model.api.request.WhatsAppWebhookRequest;
 import com.yuga.spring_rds.model.api.response.SendMessageResponse;
@@ -30,6 +31,7 @@ public class ChatService {
   @Value("${whatsapp.phone.number.id}")
   private String phoneNumberId;
 
+  static ObjectMapper mapper = WhatsAppConnector.mapper;
   @Autowired private WhatsAppConnector whatsAppConnector;
   @Autowired private WhatsAppContactService whatsAppContactService;
   @Autowired private ChatMessageRepository chatMessageRepository;
@@ -131,6 +133,18 @@ public class ChatService {
           builder
               .messageType(ChatMessage.MessageType.TEXT)
               .messageBody(requestModel.getText().getBody());
+      case interactive -> {
+        try {
+          builder.metadata(mapper.writeValueAsString(requestModel.getInteractive()));
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
+        InteractiveMessageType interactiveMessageType = requestModel.getInteractive().getType();
+        switch (interactiveMessageType) {
+          case LIST -> builder.messageType(ChatMessage.MessageType.LIST);
+          case BUTTON -> builder.messageType(ChatMessage.MessageType.BUTTON);
+        }
+      }
       default -> {
         log.info("Unsupported message type: {}", requestModel.getType());
         return;

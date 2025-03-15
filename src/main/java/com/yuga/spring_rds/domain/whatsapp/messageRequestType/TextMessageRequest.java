@@ -1,6 +1,6 @@
 package com.yuga.spring_rds.domain.whatsapp.messageRequestType;
 
-import com.yuga.spring_rds.domain.whatsapp.util.Text;
+import com.yuga.spring_rds.domain.whatsapp.util.Body;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -9,6 +9,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TextMessageRequest extends Text implements MessageRequest {
+public class TextMessageRequest extends Body implements MessageRequest {
   boolean previewUrl = true;
 }
